@@ -1,0 +1,238 @@
+.tool-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-width: 1500px;
+  height: 130px;
+  z-index: 999;
+}
+
+.tool-bar-flex {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  padding: 0 22px;
+  //flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bar-flex-left {
+  min-width: 330px;
+}
+
+.range_picker_div {
+  position: relative;
+  width: 326px
+}
+.range_picker_warp{
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  :global{
+    .ant-calendar-picker{
+      flex: 1;
+    }
+    .ant-input{
+      border: none;
+      text-align: center;
+    }
+    .ant-calendar-picker-icon{
+      display: none;
+    }
+  }
+}
+.separator{
+  display: inline-block;
+  width: 30px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  background-color: #1D2059;
+}
+
+.range-foot-btn{
+  width: 100%;
+  :global{
+    .ant-btn-link{
+      color: #fff;
+    }
+  }
+}
+
+.range_picker {
+  :global {
+    .ant-calendar-picker-input {
+      background-color: #1d2059;
+      border: none;
+      color: #00C2FF;
+
+      ::-webkit-input-placeholder {
+        color: #00C2FF;
+      }
+
+      .ant-calendar-range-picker-separator {
+        color: #00C2FF;
+      }
+      .ant-calendar-picker-icon {
+        display: none;
+      }
+    }
+  }
+}
+.range_extra_picker{
+  :global{
+    .ant-tag-blue{
+      background: transparent;
+      border-color: transparent;
+      cursor: pointer;
+      transition-duration: 0.3s;
+      &:hover{
+        color: #fff;
+        background: #1890ff;
+        transition-duration: 0.3s;
+      }
+    }
+    .ant-calendar-panel{
+      position: relative;
+      width: 100%;
+      padding-right: 110px;
+      box-sizing: border-box;
+    }
+    .ant-calendar-footer{
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 110px;
+      height: 100%;
+      padding: 38px 10px;
+      border: none;
+      border-left: 1px solid #4A4D7A;
+      &:after{
+        content: '';
+        display: inline-block;
+        vertical-align: middle;
+        width: 0;
+        height: 100%;
+      }
+    }
+    .ant-calendar-footer-btn{
+      display: inline-block;
+      vertical-align: middle;
+      width: 100%;
+      overflow: hidden;
+      //position: absolute;
+      //top: 50%;
+      //left: 0;
+      //margin-top: -36px;
+    }
+    div.ant-calendar-range-quick-selector{
+      width: 100%;
+      float: none;
+      text-align: center;
+      transform: rotateZ(0);
+    }
+    .ant-tag{
+      padding: 18px 0;
+      display: block;
+      color: #fff;
+      font-size: 14px;
+      background: none!important;
+      &:hover{
+        color: #1890ff;
+        background: none;
+      }
+      &:focus{
+        background: none;
+      }
+    }
+  }
+}
+
+.title-text {
+  width: 220px;
+  height: 66px;
+  padding: 16px 0;
+  box-sizing: border-box;
+  text-align: center;
+  background: url(../../assets/title-text-bg.png) no-repeat center;
+  background-size: 100% 100%;
+  .title-text-label {
+    display: inline-block;
+    font-size: 32px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    letter-spacing: 0;
+    color: #00c2ff;
+    line-height: 1;
+  }
+}
+
+.bar-flex-right {
+  text-align: right;
+  //padding-right: 22px;
+  box-sizing: border-box;
+}
+
+.btn-switch {
+  position: relative;
+  margin-right: 80px;
+  display: inline-block;
+}
+
+.btn-switch-angle1 {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  z-index: 9;
+  color: #0FECF2!important;
+  font-size: 20px
+}
+
+.btn-switch-angle2 {
+  position: absolute;
+  bottom: -6px;
+  left: -6px;
+  transform: rotate(-90deg);
+  z-index: 9;
+  color: #0FECF2!important;
+  font-size: 20px
+}
+
+.btn-switch-angle3 {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 9;
+  transform: rotate(90deg);
+  color: #0FECF2!important;
+  font-size: 20px
+}
+
+.btn-switch-angle4 {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  z-index: 9;
+  transform: rotate(-180deg);
+  color: #0FECF2!important;
+  font-size: 20px
+}
+
+.live-time {
+  display: inline-block;
+}
+
+.live-time-format {
+  margin-bottom: 16px;
+  font-size: 26px;
+  font-weight: normal;
+  font-stretch: normal;
+  line-height: 25px;
+  letter-spacing: 2px;
+  color: #ffffff;
+}

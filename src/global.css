@@ -1,0 +1,167 @@
+@import url("../node_modules/reset-css/reset.css");
+* { touch-action: none; }
+html, body, div, h1, h2, h3, h4, h5, h6, p, dl, dt, dd, ol, ul, li, fieldset, form, label, input, legend, table, caption, tbody, tfoot, thead, tr, th, td, textarea, article, aside, audio, canvas, figure, footer, header, mark, menu, nav, section, time, video {
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 100%;
+  font-weight: normal
+}
+
+article, aside, dialog, figure, footer, header, hgroup, nav, section, blockquote {
+  display: block;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+img {
+  border: 0 none;
+  vertical-align: top;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after, q:before, q:after {
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+strong, em, i {
+  font-style: normal;
+  font-weight: normal;
+}
+
+ins {
+  text-decoration: underline;
+}
+
+del {
+  text-decoration: line-through;
+}
+
+mark {
+  background: none;
+}
+
+body::-webkit-scrollbar {
+  display: none
+}
+
+input::-ms-clear {
+  display: none !important;
+}
+
+input::-ms-reveal {
+  display: none !important;
+}
+
+body {
+  font: 12px/1.5 \5FAE\8F6F\96C5\9ED1, \5B8B\4F53, "Hiragino Sans GB", STHeiti, "WenQuanYi Micro Hei", "Droid Sans Fallback", SimSun, sans-serif;
+  background: #fff;
+}
+
+a {
+  text-decoration: none;
+  /*color: #333;*/
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.ant-calendar {
+  transform: translateZ(0);
+}
+
+.fade-enter,
+.fade-appear {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-apper-active {
+  opacity: 1;
+  z-index: 99;
+  transition: all 500ms ease-in;
+}
+
+.fade-enter-done {
+  opacity: 1;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: all 500ms ease-in;
+}
+
+.fade-exit-done {
+  opacity: 0;
+}
+
+.modalspinning .ant-spin-blur{
+  filter: blur(5px);
+}
+
+.modalspinning.ant-spin-nested-loading > div > .ant-spin.ant-spin-show-text .ant-spin-dot{
+  width: 50px;
+  height: 50px;
+  margin: -25px;
+  margin-top: -60px;
+}
+
+#nprogress .bar{
+  /*background: #00c2ff!important;*/
+  background-image: linear-gradient(45deg, #0c0028 0%, #00c2ff 99%, #00c2ff 100%)!important;
+}
+.loginStatusModal .ant-modal-confirm-btns{
+  display: none;
+}
+.loginStatusModal.ant-modal-confirm-success .ant-modal-confirm-body > .anticon{
+  display: block;
+  float: none;
+  margin: 0 auto;
+  font-size: 50px;
+}
+.loginStatusModal .ant-modal-confirm-body .ant-modal-confirm-title{
+  margin-top: 12px;
+  text-align: center;
+  font-size: 18px;
+  color: #333;
+}
+.loginStatusModal .ant-modal-confirm-body > .anticon + .ant-modal-confirm-title + .ant-modal-confirm-content{
+  margin: 12px 0 0 0;
+  text-align: center;
+  color: #808080;
+}
+.loginStatusModal .ant-modal-content{
+  background-color: #fff;
+}
+.loginStatusModal.ant-modal-confirm .ant-modal-body{
+  padding: 32px;
+}
+
+.storeInfoWarp.ant-modal-confirm .ant-modal-confirm-btns{
+  display: none;
+}
+.storeInfoWarp.ant-modal-confirm .ant-modal-body{
+  padding: 20px;
+}

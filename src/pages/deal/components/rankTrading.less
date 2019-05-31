@@ -1,0 +1,168 @@
+.rankTrading-warp{
+  width: 100%;
+  //height: 100%;
+  height: 330px;
+}
+.rank-header{
+  margin-bottom: 6px;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+
+}
+.rank-header-list{
+  flex: 1;
+  .store-warp{
+    padding-top: 14px;
+  }
+}
+.store-warp{
+  position: relative;
+  padding-top: 4px;
+  width: 100%;
+  height: 102px;
+  box-sizing: border-box;
+}
+.store-img{
+  position: relative;
+  margin: 22px auto 0;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  border: 5px solid #c2d2e2;
+  box-sizing: border-box;
+  overflow: hidden;
+  :global {
+    img{
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+}
+.rank_1{
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: block;
+  width: 44px;
+  height: 27px;
+  background: url(../../../assets/Rank_1.png) no-repeat center;
+  background-size: 100%;
+  z-index: 10;
+}
+.rank_2{
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: block;
+  width: 44px;
+  height: 27px;
+  background: url(../../../assets/Rank_2.png) no-repeat center;
+  background-size: 100%;
+  z-index: 10;
+}
+.rank_3{
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: block;
+  width: 44px;
+  height: 27px;
+  background: url(../../../assets/Rank_3.png) no-repeat center;
+  background-size: 100%;
+  z-index: 10;
+}
+.store-name{
+  margin: 0;
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  line-height: 25px;
+  letter-spacing: 0px;
+  color: #ffffff;
+  text-align: center;
+}
+.store-sale-num{
+  margin: 0;
+  width: 100%;
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  line-height: 1;
+  letter-spacing: 0px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.rank-header-num1{
+  width: 102px;
+  .store-img{
+    width: 75px;
+    height: 75px;
+    border-color: #fbce0f;
+  }
+}
+.rank-header-num2{
+  flex: 1;
+  .store-warp{
+    padding-top: 14px;
+  }
+  .store-img{
+    width: 66px;
+    height: 66px;
+    border-color: #f5a86b;
+  }
+}
+.rank-cont{
+  margin-top: 6px;
+  width: 100%;
+  .queue-simple{
+    width: 100%;
+  }
+  :global {
+    table{
+      width: 100%;
+
+      tr{
+        width: 100%;
+      }
+    }
+
+    td{
+      width: 40%;
+      padding: 4px 12px;
+      font-size: 12px;
+      text-align: center;
+      &:first-child{
+        width: 20%;
+      }
+    }
+  }
+}
+
+.rank-list{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+
+}
+.rank-list-index{
+  width: 33.3333%;
+  padding: 4px 12px;
+  font-size: 12px;
+  text-align: center;
+}
+.rank-list-nomal{
+  width: 33.3333%;
+  padding: 4px 12px;
+  font-size: 12px;
+  text-align: center;
+}

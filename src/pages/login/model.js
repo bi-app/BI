@@ -1,0 +1,60 @@
+
+import { message, Modal} from 'antd';
+import { login } from 'api'
+import { stringify } from 'qs'
+import { router, pathMatchRegexp, setSession } from 'utils'
+export default {
+  namespace: 'login',
+  state: {
+    username: '',
+    password: ''
+  },
+  effects: {
+    *login({ payload = {} }, { call, put, select }) {
+      const response = yield call(login, payload);
+      //const { Biconfig } = yield select(_ => _.app); //获取配置信息
+      const { success, Msg, Data, statusCode } = response;
+      let secondsToGo = 2;
+      if(success && Data){
+        setSession("userInfo", Data)
+        yield put({
+          type: '_loginSucc',
+          payload: { Data },
+        })
+        yield put({ type: 'app/getBiconfig' })
+
+        const modal = Modal.success({
+          width: 280,
+          className: 'loginStatusModal',
+          title: '登录成功',
+          // content: <div><span style={{color: "#e92e3c", fontWeight: 600}}>{secondsToGo}</span> 秒后跳转至首页</div>,
+          content: "",
+          centered: true,
+        });
+        // const timer = setInterval(() => {
+        //   secondsToGo -= 1;
+        //   modal.update({
+        //     content: <div><span style={{color: "#e92e3c", fontWeight: 600}}>{secondsToGo}</span> 秒后跳转至首页</div>,
+        //   });
+        // }, 1000);
+        setTimeout(() => {
+          modal.destroy();
+          // clearInterval(timer);
+          router.push({ pathname: '/data', })
+        }, secondsToGo * 1000)
+        //
+        // message.success('登录成功，正在跳转...', 1.5).then(() => {
+        //   router.push('/data')
+        // });
+
+      } else {//262ad27c-44ce-4d2b-ba20-c093b04b5094
+        throw response
+      }
+    },
+  },
+  reducers: {
+    _loginSucc(state, {payload}) {
+      return {...state, ...payload}
+    },
+  },
+}

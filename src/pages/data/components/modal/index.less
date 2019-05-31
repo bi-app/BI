@@ -1,0 +1,201 @@
+.customTab {
+  :global {
+    .ant-row{
+      margin-bottom: 40px;
+    }
+    .ant-tabs-nav-scroll {
+      display: flex;
+      justify-content: center;
+      //
+      //.ant-tabs-nav {
+      //  //border: 1px solid #00c2ff;
+      //}
+
+      .ant-tabs-tab {
+        background-color: #13153e !important;
+        color: #00c2ff !important;
+        font-weight: bold;
+        //border: none;
+      }
+
+      //
+      .ant-tabs-tab-active {
+        background-color: #00c2ff !important;
+        color: #090237 !important;
+        font-weight: bold;
+        //border: none;
+      }
+    }
+  }
+}
+
+
+.customModal {
+  :global {
+    .ant-modal-content{
+      border: solid 2px #00c2ff;
+      background-color: #090237
+    }
+    .ant-tabs-bar{
+      border: none;
+    }
+    .ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab{
+      margin: 0;
+      border-color: #00c2ff;
+      border-left: 0;
+      border-radius: 0;
+      &:first-child{
+        border-left: 1px solid;
+        border-radius: 4px 0 0 4px;
+      }
+      &:last-child{
+        border-radius: 0 4px 4px 0;
+      }
+    }
+    .ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab-active{
+      border-color: #00c2ff;
+    }
+
+
+
+  }
+}
+.modal-border-com{
+  position: absolute;
+  width: 53px;
+  height: 53px;
+  background: url(../../../../assets/tab-extra-top.png) no-repeat center;
+  background-size: 100% 100%;
+}
+.modal-border-left-top{
+  top: -6px;
+  left: -6px;
+}
+.modal-border-left-bottom{
+  bottom: -6px;
+  left: -6px;
+  transform: rotate(-90deg);
+}
+.modal-border-right-top{
+  top: -6px;
+  right: -6px;
+  transform: rotate(90deg);
+}
+.modal-border-right-bottom{
+  bottom: -6px;
+  right: -6px;
+  transform: rotate(180deg);
+}
+.chart_item{
+  position: relative;
+  width: 100%;
+  height: 272px;
+  padding-top: 34px;
+  box-sizing: border-box;
+}
+.chart_list_title{
+  position: absolute;
+  top: 0;
+  left: 0;
+  //width: 156px;
+  color: #fff;
+  background-clip:padding-box,border-box;
+  background-origin:padding-box,border-box;
+  background-image:linear-gradient(135deg, #1E0A57, #092057), linear-gradient(135deg, #271668, #132B68);
+  border: 2px transparent solid;
+  border-bottom: none;
+  z-index: 1;
+  &:after{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: -30px;
+    width: 30px;
+    height: 2px;
+    background: #204285;
+    z-index: 9;
+  }
+  .list_title_text{
+    position: relative;
+    width: 100%;
+    padding: 0 46px 0 20px;
+    height: 34px;
+    line-height: 34px;
+    font-size: 14px;
+    &:after{
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 0;
+      right: -20px;
+      top: -6px;
+      transform: rotate(45deg);
+      border-right: 26px solid transparent;
+      border-left: 26px solid transparent;
+      border-bottom: 26px solid #090237;
+    }
+    &:before{
+      content: '';
+      position: absolute;
+      top: 15px;
+      right: -7px;
+      transform: rotate(45deg);
+      width: 48px;
+      border-top: 2px solid #243F85;
+      z-index: 4;
+    }
+    .border-top{
+      position: absolute;
+      top: -2px;
+      right: 34px;
+      width: 48px;
+      height: 2px;
+      background: #204285;
+    }
+    .border-oblique{
+      position: absolute;
+      top: 15px;
+      right: 7px;
+      transform: rotate(45deg);
+      width: 20px;
+      height: 0;
+      border-top: 2px solid #122B68;
+      z-index: 6;
+    }
+  }
+}
+.slider_four_corner_border{
+  background: linear-gradient(to left, #13153e, #13153e) left top no-repeat,
+  linear-gradient(to bottom, #0a679b, #0a679b) left top no-repeat,
+  linear-gradient(to left, #0a679b, #0a679b) right top no-repeat,
+  linear-gradient(to bottom, #0a679b, #0a679b) right top no-repeat,
+  linear-gradient(to left, #0a679b, #0a679b) left bottom no-repeat,
+  linear-gradient(to bottom, #0a679b, #0a679b) left bottom no-repeat,
+  linear-gradient(to left, #0a679b, #0a679b) right bottom no-repeat,
+  linear-gradient(to left, #0a679b, #0a679b) right bottom no-repeat;
+  background-size: 2px 20px, 20px 2px;
+}
+.chart_list_border{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 2px;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  background-color: #13153E;
+  &:before{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 188px;
+    height: 2px;
+    background-image: linear-gradient(to right, #0D1A47 0%,  #0C70A4 25%, #0CA1D8 50%, #0C70A4 75%, #0D1A47 100%);
+  }
+}
+
+

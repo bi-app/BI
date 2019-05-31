@@ -1,0 +1,87 @@
+.liveTrading{
+  position: relative;
+  width: 100%;
+  min-width: 400px;
+  height: 200px;
+  overflow: hidden;
+}
+.liveTrading-scroll{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  //height: auto;
+  //transform: translateY(40px);
+  transition: transform 400ms cubic-bezier(0.08, 0.82, 0.17, 1);
+}
+.live_list{
+  width: 100%;
+  height: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.store_img{
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  :global{
+    img{
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      &:after{
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #e5e5e5;
+      }
+    }
+  }
+}
+.store_text_label{
+  flex: 1;
+  padding: 0 6px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.store_text_label_name{
+  width: 110px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.store_text_label_sale{
+  width: 90px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.store_text_label_inner{
+  width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+}
+
+
+.ant-carousel .slick-slide {
+  text-align: center;
+  height: 160px;
+  line-height: 160px;
+  background: #364d79;
+  overflow: hidden;
+}
