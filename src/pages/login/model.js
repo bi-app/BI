@@ -1,8 +1,7 @@
 
-import { message, Modal} from 'antd';
+import { Modal, message} from 'antd';
 import { login } from 'api'
-import { stringify } from 'qs'
-import { router, pathMatchRegexp, setSession } from 'utils'
+import { router, setSession } from 'utils'
 export default {
   namespace: 'login',
   state: {
@@ -12,8 +11,7 @@ export default {
   effects: {
     *login({ payload = {} }, { call, put, select }) {
       const response = yield call(login, payload);
-      //const { Biconfig } = yield select(_ => _.app); //获取配置信息
-      const { success, Msg, Data, statusCode } = response;
+      const { success, Data, Msg } = response;
       let secondsToGo = 2;
       if(success && Data){
         setSession("userInfo", Data)
@@ -47,8 +45,20 @@ export default {
         //   router.push('/data')
         // });
 
-      } else {//262ad27c-44ce-4d2b-ba20-c093b04b5094
-        throw response
+      } else {
+        // const modal = Modal.error({
+        //   width: 280,
+        //   className: 'loginStatusModal',
+        //   title: Msg,
+        //   // content: <div><span style={{color: "#e92e3c", fontWeight: 600}}>{secondsToGo}</span> 秒后跳转至首页</div>,
+        //   content: "",
+        //   centered: true,
+        // });
+        // setTimeout(() => {
+        //   modal.destroy();
+        // }, 1000)
+        message.error(Msg);
+        // throw response
       }
     },
   },

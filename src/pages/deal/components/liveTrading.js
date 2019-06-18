@@ -1,198 +1,161 @@
-import React, { PureComponent, Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import style from './liveTrading.less';
+import PropTypes from 'prop-types'
 import { Ellipsis } from "ant-design-pro";
-import { Spin, Empty } from "antd";
-import styled, { keyframes } from 'styled-components'
-import * as utils from './raf'
-import _ from 'lodash';
+import { Empty, Carousel } from "antd";
+import styled from 'styled-components'
+// import * as utils from './raf'
 import produce from "immer";
 import EmptyIma from 'assets/Empty.svg';
+// import _ from 'lodash'
 import { Timer } from 'utils/Timer'
 import { immutableRenderDecorator } from 'react-immutable-render-mixin';
 import { connect } from 'dva/index';
+// import numeral from 'numeral';
+const isEqual = require("react-fast-compare");
+import Swiper from 'swiper/dist/js/swiper.js'
+import 'swiper/dist/css/swiper.min.css';
+
+
 //补丁可以较好的兼容支持该特性的浏览器
-utils.raf();
+// utils.raf();
 const EmptyWarp = styled.div`
   padding: 24px 0
 `;
 
-@immutableRenderDecorator
-@connect(({ deal }) => ({ deal }))
-class Trading extends Component {
+// @immutableRenderDecorator
+// @connect(({ deal }) => ({ deal }))
+class LiveTrading extends React.Component {
   domMw = React.createRef();
-  domMi = React.createRef();
-  timerMarquee = null;
-  newTimer = null;
   Time = null;
+  newTimer = null;
+  Carousel = null;
   state = {
-    listData: [],
+    livingData: [],
   }
 
-  /**
-   * _verticalMarquee = () => {
-    this.domMw.scrollTop === this.domMi.offsetHeight  ? (this.domMw.scrollTop -= this.domMi.offsetHeight) :  this.domMw.scrollTop++;
-    // console.warn("this.domMw.scrollTop", test)
-    this.timerMarquee = requestAnimationFrame(this._verticalMarquee);
-  };
-   * */
-
-  //竖向滚动
-  _verticalMarquee = () => {
-    this.domMw.current.scrollTop === this.domMi.current.offsetHeight  ? (this.domMw.current.scrollTop -= this.domMi.current.offsetHeight) :  this.domMw.current.scrollTop++;
-    // console.warn("this.domMw.scrollTop", test)
-    this.timerMarquee = requestAnimationFrame(this._verticalMarquee);
-  };
-
-  //暂停
-  stopMarquee = () => {
-    this.timerMarquee && cancelAnimationFrame(this.timerMarquee)
-  }
-
-  componentDidMount() {
-    this.domMw.current && this.domMi.current && this._verticalMarquee();
-  }
-
-  autoPlay = (lastProps, nextProps) => {
-    const Len = nextProps.storesliving.length;
-    // console.warn("be.updateIndex", be.updateIndex)
-    // console.warn("最新序号：", nextProps.deal.updateIndex)
-    // console.error("Len", Len)
-    if(this.props.updateIndex >= Len){
-      this.props.dispatch({type: 'deal/_updateIndexHandle', payload: { updateIndex: 0}});
-      this.newTimer && this.newTimer.removeSchedule(this.Time);
-      return
+  static getDerivedStateFromProps(props, state) {
+    if (props.storesliving.length !== 0 && !isEqual(props.storesliving, state.livingData)) {
+      return {
+        livingData: props.storesliving
+      }
     }
-    const currentOrder = nextProps.storesliving[this.props.updateIndex]; //当前订单信息
-    // let initFloorSalesVal = [];
-    // let initTypeSalesVal = [];
-
-    if(currentOrder){
-      // const { FloorId, TotalSaleAmt, StoreName, OperationTypeId } = currentOrder;
-      this.setState((preState) => this._AddItemList(preState, currentOrder),
-        () => {
-          const newIndex = Object.assign({}, lastProps.deal)
-          newIndex.updateIndex += 1;
-          lastProps.dispatch({type: 'deal/_updateIndexHandle', payload: { updateIndex: newIndex.updateIndex}});
-          lastProps.dispatch({type: 'deal/updateFatherVal', payload: { Data: currentOrder}});
-
-          if(this.state.listData.length > 6){
-            this.domMw.current.scrollTop = 0;
-            this.setState(produce(draft => {
-              draft.listData.shift()
-              return draft;
-            }))
-          }
-        })
-    }
-
-
-
-    // _.forEach(be.floorSalesVal, (e, i) => {
-    //   if(e.FloorId === FloorId){
-    //     e.TotalSaleAmt = Number((e.TotalSaleAmt + TotalSaleAmt).toFixed(2));
-    //     // console.log("新的e", e)
-    //     initFloorSalesVal.push(e)
-    //   }else {
-    //     // console.log("新的就", e)
-    //     initFloorSalesVal.push(e)
-    //   }
-    // })
-    // _.forEach(be.typeSalesVal, (e, i) => {
-    //   if(e.OperationID === OperationTypeId){
-    //     e.TotalSaleAmt = Number((e.TotalSaleAmt + TotalSaleAmt).toFixed(2));
-    //     initTypeSalesVal.push(e)
-    //   }else {
-    //     initTypeSalesVal.push(e)
-    //   }
-    // })
-    // console.log("initFloorSalesVal", initFloorSalesVal)
-    // console.log("initTypeSalesVal", initTypeSalesVal)
-
-    // af.dispatch({
-    //   type: 'deal/_addFloorSalesVal',
-    //   payload: {
-    //     floorSalesVal: initFloorSalesVal,
-    //     typeSalesVal: initTypeSalesVal,
-    //   }});
-
-    // lastProps.dispatch({ type: 'deal/_setCurrentOrder', payload: {currentOrder} });//当前订单
-
-
-
+    return null
   }
 
   shouldComponentUpdate(nextProps, nextState){
-    if(this.state.listData !== nextState.listData){
-      return true;
-    }
-    return false;
+    return !isEqual(this.state.livingData, nextState.livingData)
   }
 
-  _AddItemList = (state, item) => {
-    return produce(state, draft => {
-      draft.listData.push(item)
-    });
-  };
-
-  componentWillReceiveProps(nextProps) {
-    // console.log("获取序号=====this.props", this.props)
-    // console.log("获取序号=====nextProps", nextProps)
-    // const { dispatch } = nextProps
-    if(this.props.storesliving !== nextProps.storesliving){
-      // const Len = nextProps.storesliving.length;//最新的长度
-      this.newTimer = new Timer();
-      this.Time = this.newTimer.interval(3000, () => {
-        // console.warn("获取序号=====nextProps", this.props.updateIndex)
-        this.autoPlay(this.props, nextProps);
-        // if(this.props.updateIndex > Len){
-        //   // dispatch({type: 'deal/_updateIndexHandle', payload: { updateIndex: 0}});
-        //   // dispatch({ type: 'deal/_setCurrentOrder', payload: {currentOrder: {}} });//当前订单
-        //
-        // }
+  initialBannerSwiper = () => {
+    if(this.bannerSwiper){
+      this.bannerSwiper = new Swiper('.swiper-container', {
+        updateOnImagesReady : true,
+        direction:'vertical',
+        slidesPerView: 5, //设置slider容器能够同时显示的slides数量(carousel模式) 默认值为1。
+        slidesPerGroup: 5,
+        loopedSlides: 65,
+        speed: 300,
+        observer: true,  //当改变swiper的样式（例如隐藏/显示）或者修改swiper的子元素时，自动初始化swiper。
+        loopFillGroupWithBlank: true,
+        observeParents: true, //将observe应用于Swiper的父元素。当Swiper的父元素变化时，例如window.resize，Swiper更新。
+        shortSwipes: false,  // 这个属性后面会说
+        slideToClickedSlide: false, //设置为true则点击slide会过渡到这个slide。
+        autoplay: {
+          delay: 300,
+          stopOnLastSlide: true,
+          disableOnInteraction:false,
+        },
       })
+      if(this.bannerSwiper.autoplay.running){
+        this.bannerSwiper.autoplay.start();
+      }else {
+        this.bannerSwiper.autoplay.stop();
+      }
+      return
     }
+    this.bannerSwiper = new Swiper('.swiper-container', {
+      updateOnImagesReady : true,
+      direction:'vertical',
+      slidesPerView: 5, //设置slider容器能够同时显示的slides数量(carousel模式) 默认值为1。
+      speed: 300,
+      observer: true,  //当改变swiper的样式（例如隐藏/显示）或者修改swiper的子元素时，自动初始化swiper。
+      loopFillGroupWithBlank: true,
+      observeParents: true, //将observe应用于Swiper的父元素。当Swiper的父元素变化时，例如window.resize，Swiper更新。
+      shortSwipes: false,  // 这个属性后面会说
+      slideToClickedSlide: false, //设置为true则点击slide会过渡到这个slide。
+      autoplay: {
+        delay: 300,
+        stopOnLastSlide: true,
+        disableOnInteraction:false,
+      },
+    })
+  }
+
+  componentDidUpdate(nextProps, nextState, prevState){//setState()结束之后都会自动调用componentDidUpdate()
+    this.initialBannerSwiper()
+    console.log("更新之前的状态")
   }
 
   componentWillUnmount() {
-    this.stopMarquee();
-    // disconnect()
-    this.newTimer && this.newTimer.removeSchedule(this.Time);
+    this.newTimer && clearTimeout(this.newTimer);
+    if(this.bannerSwiper){
+      this.bannerSwiper.detachEvents()
+      this.bannerSwiper.destroy()
+    }
   }
 
   render() {
-    const { listData } = this.state;
-    // console.warn("我渲染了:", listData)
+    const { livingData } = this.state;
+    let imgHtml = livingData.map((_, index)=>{
+      return(
+        <div className="swiper-slide"  key={_.ID}>
+          <div className={style.live_list}>
+            <div className={style.store_img}><img src={_.StoreCoverImg && _.StoreCoverImg} alt=""/></div>
+            <div className={style.store_text_label_name}>
+              <Ellipsis
+                tooltip={{
+                  placement:"left",
+                  overlayClassName: style.tooltip,
+                  trigger: 'click',
+                }}
+                lines={1}
+              >{_.StoreName}</Ellipsis>
+            </div>
+            <div className={style.store_text_label_sale}>{`${_.TotalSaleAmt}元`}</div>
+            <div className={style.store_text_label}>{_.BillTime}</div>
+          </div>
+        </div>
+      )
+    })
 
     return (
       <div className={style.liveTrading} ref={this.domMw}>
-        <div
-          className={style['liveTrading-scroll']}
-          ref={this.domMi}
-        >
-          {
-            listData.length === 0 ? <EmptyWarp>
-                <Empty
-                  image={EmptyIma}
-                  imageStyle={{height: 120,}}
-                  description={<span style={{color: '#2880B4', fontSize: 16}}
-                  >暂无相关数据</span>} />
-              </EmptyWarp> :
-              listData.map((_, index) => (
-                  <div
-                    key={index}
-                    className={style.live_list}
-                  >
-                    <div className={style.store_img}><img src={""} alt=""/></div>
-                    <div className={style.store_text_label_name}><Ellipsis tooltip lines={1}>{_.StoreName}</Ellipsis></div>
-                    <div className={style.store_text_label_sale}>{`${_.TotalSaleAmt}元`}</div>
-                    <div className={style.store_text_label}>{_.BillTime}</div>
-                  </div>
-              ))
-          }
-        </div>
+        {
+          livingData.length === 0 ? <EmptyWarp>
+            <Empty
+              image={EmptyIma}
+              imageStyle={{height: 120,}}
+              description={<span style={{color: '#2880B4', fontSize: 16}}
+              >暂无相关数据</span>} />
+          </EmptyWarp> :
+          <div className="swiper-container">
+            <div className="swiper-wrapper">
+            {imgHtml}
+            </div>
+          </div>
+        }
       </div>
     )
   }
 }
 
-export default Trading
+LiveTrading.propTypes = {
+  updateIndex: PropTypes.number,
+  floorSalesVal: PropTypes.array,
+  typeSalesVal: PropTypes.array,
+  storesliving: PropTypes.array,
+  dispatch: PropTypes.func,
+}
+
+export default LiveTrading

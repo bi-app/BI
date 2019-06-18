@@ -74,9 +74,9 @@ export default (props) => {
               <SplitLine show={false} />
               <AxisLabel color="#fff" fontSize={10} />
             </YAxis>
-            <Series name="会员销售" type="bar" barWidth={12} data={props.CustSaleAmt} />
-            <Series name="非会员销售" type="bar" barWidth={12} data={props.NoCustSaleAmt} />
-            <Series name="客流" type="line" yAxisIndex={1} smooth={true} symbol="circle" symbolSize={6} showSymbol={true} data={props.GuestCount} />
+            <Series z={3} name="客流" type="line" yAxisIndex={1} smooth={true} symbol="circle" symbolSize={6} showSymbol={true} data={props.GuestCount} />
+            <Series z={2} stack="销售" name="会员销售" barGap="-100%" type="bar"  data={props.CustSaleAmt} />
+            <Series z={1} stack="销售" name="非会员销售" barGap="-100%" type="bar"  data={props.NoCustSaleAmt} />
           </Recharts>
       }
 

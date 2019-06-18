@@ -3,7 +3,7 @@ export const dva = {
   config: {
     onError(err) {
       err.preventDefault();
-      console.warn(err);
+      console.warn("报错：",err);
     },
   },
   // plugins: [

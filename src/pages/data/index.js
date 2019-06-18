@@ -10,7 +10,9 @@ import { connect } from 'dva'
 import moment from 'moment'
 import { withRouter } from 'umi'
 import MyIcon from '../../components/myicon'
-import { Sales, Income, Passflow, Member, FloorAnalysis, TypeAnalysis} from "./components/chart";
+import { Sales, Income, Passflow, Member, FloorAnalysis, TypeAnalysis} from "@/pages/data/components/chart";
+import ReactCSSTransitionGroup from "react-addons-css-transition-group";
+import "animate.css";
 
 @withRouter
 @connect(({ app, globalData, data }) => ({ app, globalData, data }))
@@ -62,6 +64,7 @@ class Data extends PureComponent {
     this.setState({ visible: true });
   }
 
+  /**店铺排行数据*/
   modalFetch = (StartDate, EndDate, SearchNum = 5, FloorID) => {
     const { dispatch} = this.props;
     //项目
@@ -132,14 +135,10 @@ class Data extends PureComponent {
   }
 
   handleOk = (e) => {
-    this.setState({
-      visible: false,
-    });
+    this.setState({ visible: false, });
   }
   handleCancel = (e) => {
-    this.setState({
-      visible: false,
-    });
+    this.setState({ visible: false });
   }
 
   render() {
@@ -224,31 +223,39 @@ class Data extends PureComponent {
           </Row>
           <Row gutter={16}>
             <Col span={14}>
-              <div className={styles.div1_main}>
-                <div className={styles.div1_chart}>
-                  {
-                    FloorInfoList.length !== 0 ? <div className={styles['btn-switch']}>
-                      <div className={styles['btn-switch-in']}>
-                        <MyIcon className={styles['btn-switch-angle1']} type="icon-guaijiao"/>
-                        <MyIcon className={styles['btn-switch-angle2']} type="icon-guaijiao"/>
-                        <MyIcon className={styles['btn-switch-angle3']} type="icon-guaijiao"/>
-                        <MyIcon className={styles['btn-switch-angle4']} type="icon-guaijiao"/>
-                        <Button type="primary" size='large' onClick={this.showTrend} >
-                          <MyIcon style={{fontSize: 20}} type="icon-chart"/>
-                        </Button>
-                      </div>
-                    </div> : null
-                  }
-                  <Modal
-                    visible={visible}
-                    onOk={this.handleOk}
-                    onCancel={this.handleCancel}
-                    width={1200}
-                    {...RankModal}
-                  />
-                  <Svg />
+              <ReactCSSTransitionGroup
+                transitionEnter={true}
+                transitionLeave={true}
+                transitionEnterTimeout={2500}
+                transitionLeaveTimeout={1500}
+                transitionName="animated"
+              >
+                <div key="amache" className={'animated bounceInLeft' + ' ' +styles.div1_main}>
+                  <div className={styles.div1_chart}>
+                    {
+                      FloorInfoList.length !== 0 ? <div className={styles['btn-switch']}>
+                        <div className={styles['btn-switch-in']}>
+                          <MyIcon style={{ color: '#0FECF2' }} className={styles['btn-switch-angle1']} type="icon-guaijiao"/>
+                          <MyIcon style={{ color: '#0FECF2' }} className={styles['btn-switch-angle2']} type="icon-guaijiao"/>
+                          <MyIcon style={{ color: '#0FECF2' }} className={styles['btn-switch-angle3']} type="icon-guaijiao"/>
+                          <MyIcon style={{ color: '#0FECF2' }} className={styles['btn-switch-angle4']} type="icon-guaijiao"/>
+                          <Button type="primary" size='large' onClick={this.showTrend} >
+                            <MyIcon style={{fontSize: 20}} type="icon-chart"/>
+                          </Button>
+                        </div>
+                      </div> : null
+                    }
+                    <Modal
+                      visible={visible}
+                      onOk={this.handleOk}
+                      onCancel={this.handleCancel}
+                      width={1200}
+                      {...RankModal}
+                    />
+                    <Svg />
+                  </div>
                 </div>
-              </div>
+              </ReactCSSTransitionGroup>
             </Col>
             <Col span={10}>
               <div className={styles.div1_main}>

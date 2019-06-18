@@ -1,10 +1,45 @@
-import { cloneDeep, flow, compact } from 'lodash'
-import umiRouter from 'umi/router'
-import pathToRegexp from 'path-to-regexp'
-import moment from 'moment'
-import _ from 'lodash'
-export classnames from 'classnames'
-export request from './request'
+import { cloneDeep, flow, compact } from 'lodash';
+import umiRouter from 'umi/router';
+import pathToRegexp from 'path-to-regexp';
+import moment from 'moment';
+import _ from 'lodash';
+import { Statistic } from 'antd'
+export classnames from 'classnames';
+export request from './request';
+
+
+/**格式化数值*/
+
+export function formaterVal(val = Number, nomalprecision, precision, nomalsuffix, suffix, valueStyle, style) {
+  if(Number(val) > 10000){
+    return <Statistic
+      value={val/10000}
+      precision={precision}
+      valueStyle={valueStyle}
+      suffix={suffix}
+      style={style}
+    />
+  }
+  return <Statistic
+    value={val}
+    precision={nomalprecision}
+    valueStyle={valueStyle}
+    suffix={nomalsuffix}
+    style={style}
+  />
+}
+
+/**
+ * 计算周期统计时间
+ * */
+export function _cycleDate() {
+  const nowDay = moment().date()
+  if(nowDay < 15){
+    return moment().subtract(1, 'month').startOf('month')
+  }else {
+    return moment()
+  }
+}
 
 export function _filterNodes(faId, souces, ) {
   let result = {};
@@ -102,16 +137,23 @@ export function rangeDate(type = {}) {
         StartTime = `${moment().isoWeekday(1).format('YYYY-MM-DD')} ${type.StartHourMinSec}`;
         EndTime = `${moment().add(1, 'week').startOf('isoWeek').isoWeekday(1).format('YYYY-MM-DD')} ${type.StartHourMinSec}`;
       }else {//多个
-        const lg = weekData.filter(_ => Number(_) > weekOfday);
+        const lg = weekData.filter(_ => Number(_) >= weekOfday);
         const sm = weekData.filter(_ => Number(_) <= weekOfday);
-
+        // console.log("weekOfday", weekOfday)
+        // console.log("sm", sm)
+        // console.log("lg", lg)
         if(sm.length === 0 ){
           const lgLen = lg.length - 1
           StartTime = `${moment().subtract(7, 'day').isoWeekday(Number(lg[lgLen])).format('YYYY-MM-DD')} ${type.StartHourMinSec}`;
           EndTime = `${moment().isoWeekday(Number(lg[0])).format('YYYY-MM-DD')} ${type.StartHourMinSec}`;
         }else {
-          StartTime = `${moment().isoWeekday(Number(sm[sm.length - 1])).format('YYYY-MM-DD')} ${type.StartHourMinSec}`;
-          EndTime = `${moment().isoWeekday(Number(lg[0])).format('YYYY-MM-DD')} ${type.StartHourMinSec}`;
+          if(sm.length > 1){
+            StartTime = `${moment().isoWeekday(Number(sm[sm.length - 2])).format('YYYY-MM-DD')} ${type.StartHourMinSec}`;
+            EndTime = `${moment().isoWeekday(Number(sm[sm.length - 1])).format('YYYY-MM-DD')} ${type.StartHourMinSec}`;
+          }else {
+            StartTime = `${moment().isoWeekday(Number(sm[sm.length - 1])).format('YYYY-MM-DD')} ${type.StartHourMinSec}`;
+            EndTime = `${moment().isoWeekday(Number(lg[0])).format('YYYY-MM-DD')} ${type.StartHourMinSec}`;
+          }
         }
       }
       return {StartTime, EndTime};
@@ -177,7 +219,12 @@ export function rangeDate(type = {}) {
       return {
         StartTime: moment().format('YYYY-MM-DD HH:mm'),
         EndTime: `${moment(new Date(type.CustomDefineStartDate)).format('YYYY-MM-DD')} ${type.StartHourMinSec}`
-      }
+      };
+    default :
+      return {
+        StartTime: moment().format('YYYY-MM-DD HH:mm'),
+        EndTime: moment().format('YYYY-MM-DD HH:mm')
+      };
   }
 }
 

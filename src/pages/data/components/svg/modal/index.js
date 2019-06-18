@@ -23,10 +23,7 @@ class Trend extends Component {
     const { global } = loading;
     const { Biconfig } = app;
     const { DefaultStoreLogoUrl } = Biconfig;
-
-    // console.log("店铺弹窗渲染。。。00")
     const antIcon = <Icon type="loading" style={{ fontSize: 50 }} spin />;
-
     const statusNum = (value) => {
       let initNum = 0;
       if( Number(value) >= 0 ){
@@ -80,7 +77,7 @@ class Trend extends Component {
                     <Avatar
                       size={80}
                       style={{ backgroundColor: '#fff' }}
-                      src={DefaultStoreLogoUrl}
+                      src={GetStoreInfo.StoreCoverImg}
                     />
                   </div>
                   <h3 className={styles.store_info_name}>
@@ -93,23 +90,41 @@ class Trend extends Component {
                     <li>
                       <span className={styles.store_extra_title}>销售排名：</span>
                       <span className={styles.store_extra_cont}>
-                        <Statistic
-                          value={GetStoreInfo.SaleRank}
-                          precision={0}
-                          valueStyle={{ color: '#ff8160' }}
-                          prefix={"NO."}
-                        />
+                        {
+                          GetStoreInfo.SaleRank && GetStoreInfo.SaleRank !== '0' ?
+                            <Statistic
+                              value={GetStoreInfo.SaleRank}
+                              precision={0}
+                              valueStyle={{ color: '#ff8160' }}
+                              prefix={"NO."}
+                            /> :
+                            <Icon type='minus' />
+                        }
+                        {/*<Statistic*/}
+                          {/*value={GetStoreInfo.SaleRank}*/}
+                          {/*precision={0}*/}
+                          {/*valueStyle={{ color: '#ff8160' }}*/}
+                          {/*prefix={"NO."}*/}
+                        {/*/>*/}
                       </span>
                     </li>
                     <li>
                       <span className={styles.store_extra_title}>收益排名：</span>
                       <span className={styles.store_extra_cont}>
-                        <Statistic
-                          value={GetStoreInfo.EarningRank}
-                          precision={0}
-                          valueStyle={{ color: '#ff8160' }}
-                          prefix={"NO."}
-                        />
+                        {
+                          GetStoreInfo.EarningRank && GetStoreInfo.EarningRank !== '0' ? <Statistic
+                            value={GetStoreInfo.EarningRank}
+                            precision={0}
+                            valueStyle={{ color: '#ff8160' }}
+                            prefix={"NO."}
+                          /> : <Icon type='minus' />
+                        }
+                        {/*<Statistic*/}
+                          {/*value={GetStoreInfo.EarningRank}*/}
+                          {/*precision={0}*/}
+                          {/*valueStyle={{ color: '#ff8160' }}*/}
+                          {/*prefix={"NO."}*/}
+                        {/*/>*/}
                       </span>
                     </li>
                     <li>
@@ -118,7 +133,7 @@ class Trend extends Component {
                     </li>
                     <li>
                       <span className={styles.store_extra_title}>占地面积：</span>
-                      <span className={styles.store_extra_cont}>{GetStoreInfo.StoreArea}</span>
+                      <span className={styles.store_extra_cont}>{`${GetStoreInfo.StoreArea} m²`}</span>
                     </li>
                     {/*<li>*/}
                     {/*<span className={styles.store_extra_title}>租金收取方式：</span>*/}
@@ -130,7 +145,7 @@ class Trend extends Component {
                     </li>
                     <li>
                       <span className={styles.store_extra_title}>租金收益：</span>
-                      <span className={styles.store_extra_cont}>{GetStoreInfo.RentEarning}</span>
+                      <span className={styles.store_extra_cont}>{`${GetStoreInfo.RentEarning} 元`}</span>
                     </li>
 
                     <li className={styles['store-position']}>
@@ -154,6 +169,7 @@ class Trend extends Component {
                     </li>
                   </ul>
                 </div>
+
               </Col>
               <Col span={12} >
                 <div className={styles.store_chart_item + ' ' + styles.slider_card_corner_border}>
@@ -207,7 +223,7 @@ class Trend extends Component {
                       title="销售坪效"
                       value={StoreCompare.SaleAmtPerArea}
                       precision={2}
-                      suffix="元"
+                      suffix="元/m²"
                     />
                     <Statistic
                       value={statusNum(StoreCompare.SaleAmtPerAreaSequentialValue)}
@@ -222,7 +238,7 @@ class Trend extends Component {
                       title="收益坪效"
                       value={StoreCompare.RentEarningPerArea}
                       precision={2}
-                      suffix="元"
+                      suffix="元/m²"
                     />
                     <Statistic
                       value={statusNum(StoreCompare.EarningPerAreaSequentialValue)}
@@ -277,13 +293,12 @@ class Trend extends Component {
                       <XAxis type="category" data={StoreSale.SaleYearMonth}>
                         <SplitLine show={false} />
                         <AxisTick show={false} />
-
                         <AxisLine>
                           <LineStyle color="#fff"/>
                         </AxisLine>
                         <AxisLabel color="#fff" fontSize={10}/>
                       </XAxis>
-                      <YAxis type="value" name="金额（万元）" min={0}>
+                      <YAxis type="value" name="金额（元）" min={0}>
                         <AxisLine>
                           <LineStyle color="#fff" />
                         </AxisLine>
@@ -294,8 +309,8 @@ class Trend extends Component {
                       </YAxis>
                       <Series z={4} name="业态平均" type="line" symbolSize={0} smooth={true} data={StoreSale.OperationTypeSaleAvg} />
                       <Series z={3} name="项目平均" type="line" symbolSize={0} smooth={true} data={StoreSale.MallSaleAvg} />
-                      <Series z={2} barWidth={6} barGap="-100%" name="会员销售" type="bar" data={StoreSale.CustomerSaleAvg} />
-                      <Series z={1} barWidth={6} barGap="-100%" name="非会员销售" type="bar" data={StoreSale.NonCustomerSaleAvg} />
+                      <Series z={2} stack="销售" barGap="-100%" name="会员销售" type="bar" data={StoreSale.CustomerSaleAvg} />
+                      <Series z={1} stack="销售" barGap="-100%" name="非会员销售" type="bar" data={StoreSale.NonCustomerSaleAvg} />
                     </Recharts>
                   </div>
                 </div>
@@ -338,9 +353,27 @@ class Trend extends Component {
                         <AxisTick show={false} />
                         <NameTextStyle color="#fff" fontSize={10}/>
                       </YAxis>
-                      <Series z={3} name="业态平均" type="line" symbolSize={0} smooth={true} data={StoreSequential.OperationTypeEarningAvg} />
-                      <Series z={2} symbolSize={0} smooth={true} name="项目平均" type="line" data={StoreSequential.MallEarningAvg} />
-                      <Series z={1} barWidth={6} barGap="-100%" name="收益额" type="bar" data={StoreSequential.StoreEarning} />
+                      <Series
+                        z={3}
+                        name="业态平均"
+                        type="line"
+                        symbolSize={1}
+                        smooth={true}
+                        data={StoreSequential.OperationTypeEarningAvg}
+                      >
+                        <LineStyle normal={{"width":3,"shadowColor":"#090237","shadowBlur":8,"shadowOffsetY":6}} />
+                      </Series>
+                      <Series
+                        z={2}
+                        symbolSize={1}
+                        smooth={true}
+                        name="项目平均"
+                        type="line"
+                        data={StoreSequential.MallEarningAvg}
+                      >
+                        <LineStyle normal={{"width":3,"shadowColor":"#090237","shadowBlur":8,"shadowOffsetY":6}} />
+                      </Series>
+                      <Series z={1} barWidth={14} barGap="-100%" name="收益额" type="bar" data={StoreSequential.StoreEarning} />
                     </Recharts>
                   </div>
                 </div>

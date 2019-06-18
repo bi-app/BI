@@ -1,11 +1,11 @@
-import React, { Fragment, PureComponent } from 'react'
+import React, { Fragment, PureComponent } from 'react';
 import withRouter from 'umi/withRouter';
 import { connect } from 'dva';
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import styles from './index.less';
 import Header from "../components/header";
-import Error from '../pages/404'
-import { Loader } from 'components'
+import Error from '../pages/404';
+import { Loader } from 'components';
 
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
@@ -14,7 +14,6 @@ class Layout extends PureComponent {
     const { location, children, app, loading } = this.props;
     const { hasPermission } = app;
     const { pathname } = location;
-
     if (pathname === '/login') {
       return <Fragment>{children}</Fragment>
     }
@@ -29,7 +28,8 @@ class Layout extends PureComponent {
             <CSSTransition
               key={pathname}
               classNames="fade"
-              timeout={800}
+              timeout={1000}
+              appear={true}
               unmountOnExit
             >
               {children}

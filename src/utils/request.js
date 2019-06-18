@@ -67,7 +67,7 @@ export default function request(options) {
       })
     })
     .catch(error => {
-      const { response, Message } = error
+      const { response, message } = error
 
       if (String(message) === CANCEL_REQUEST_MESSAGE) {
         return {

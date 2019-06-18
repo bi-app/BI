@@ -8,7 +8,6 @@ import {
   GetTypeSaleAnalysis,
   GetStoresRankInfo,
   GetStoreslivingInfo,
-  GetStoresInfo,
 } from 'api'
 import _ from 'lodash'
 import moment  from 'moment'
@@ -22,11 +21,6 @@ import mainStore from 'assets/mainstore-icon.svg'
 import Matching from 'assets/Matching-icon.svg'
 import produce from "immer"
 
-
-function clone(origin) {
-  let originProto = Object.getPrototypeOf(origin);
-  return Object.assign(Object.create(originProto), origin);
-}
 
 const matchSymbol = (id) => {
   let SymbolUrl = null
@@ -49,6 +43,10 @@ const matchSymbol = (id) => {
 typePoint.nodes.forEach(function(node, index) {
   node.symbol = matchSymbol(node.id)
 });
+
+
+
+const delay = ms => new Promise(resolve => setInterval(resolve, ms));
 
 export default {
   namespace: 'deal',
@@ -117,16 +115,19 @@ export default {
     floorSales: [],
     typeSales: [],
     updateIndex: 0, //更新序号，用于数据遍历
-    currentOrder: {
-      BillTime: "",
-      FloorId: "",
-      ID: "",
-      OperationTypeId: "",
-      StoreCoverImg: "",
-      StoreID: "",
-      StoreName: "",
-      TotalSaleAmt: 0
-    }
+    currentOrder: [],
+    floorEffect: {
+      effect: [],
+      center: [],
+      source: [],
+      target: [],
+    },
+    typeEffect: {
+      effect: [],
+      center: [],
+      source: [],
+      target: [],
+    },
   },
   subscriptions: {
     setup({ dispatch, history }) {
@@ -135,6 +136,7 @@ export default {
         // console.log("已进入页面：", location)
         dispatch({type: '_getPointForFloor', payload: {queryType: 1}})
         dispatch({type: '_getPointForType', payload: {queryType: 2}})
+
       })
     },
   },
@@ -142,12 +144,12 @@ export default {
   effects: {
     *_getPointForFloor({ payload }, { call, put }) {
       const response = yield call(GetStoresPositionInfo, payload);
-      const { success, Msg, Data, statusCode } = response;
+      const { success, Data } = response;
       let nodes = [],
           edges = [];
       if(success && Data && Data !== null){
         _.forEach(floorPoint.nodes, (item, index) => {
-          if(Number(item.id) === 0) nodes.push(item)
+          if(Number(item.id) === 0) nodes.push(item);
           _.forEach(Data, (elem, i) => {
             if(elem.BIStarPositionSort === Number(item.id)){
               nodes.push({
@@ -186,7 +188,7 @@ export default {
     },
     *_getPointForType({ payload }, { call, put }) {
       const response = yield call(GetStoresPositionInfo, payload);
-      const { success, Msg, Data, statusCode } = response;
+      const { success, Data } = response;
       let nodes = [],
         edges = [];
       if(success && Data){
@@ -225,12 +227,80 @@ export default {
         throw response
       }
     },
+    *_getPointBasicSale({ payload }, { call, put, select }) {//飞行图点位数据(基础)
+      const floorResponse = yield call(GetFloorStoreSale, payload);
+      const typeResponse = yield call(GettypeStoreSale, payload);
+      const { floorPoint, typePoint } = yield select(_ => _.deal);
+
+      if(floorResponse.Status === 1 && floorResponse.Data && typeResponse.Status === 1 && typeResponse.Data){
+          const FloorSale = floorResponse.Data.FloorSale;//楼层销售
+          const FloorSaleAmt = floorResponse.Data.MallSaleAmt;//楼层总计
+          const OperationSale = typeResponse.Data.OperationSale;//业态销售
+          const typeSaleAmt = typeResponse.Data.MallSaleAmt;//业态总计
+
+          const newfloorPoint = produce(floorPoint, nextData => {
+            nextData.nodes[0].name = String(numeral(FloorSaleAmt).format('0,0'));
+            nextData.nodes[0].attributes.name = String(FloorSaleAmt);
+
+            _.forEach(nextData.nodes, (ele) => {
+              _.forEach(FloorSale, (item) => {
+                const FloorName = ele.name.split('F')[0]
+                if(FloorName === item.FloorName) {
+                  ele.symbolSize = item.symbolSize
+                  ele.TotalSaleAmt = item.TotalSaleAmt
+                  ele.searchId = item.FloorId
+                  ele.FloorId = item.FloorId
+                  return ele
+                }
+                _.forEach(item.StoreSale, (elem) => {
+                  if(ele.name === elem.StoreName){
+                    ele.symbolSize = elem.symbolSize
+                    ele.TotalSaleAmt = elem.TotalSaleAmt
+                    ele.searchId = elem.StoreID
+                    return ele
+                  }
+                })
+              })
+            })
+          });
+
+          const newTypePoint = produce(typePoint, nextData => {
+            nextData.nodes[0].name = String(numeral(typeSaleAmt).format('0,0'))
+            nextData.nodes[0].attributes.name = String(typeSaleAmt)
+            _.forEach(nextData.nodes, (ele) => {
+              _.forEach(OperationSale, (item) => {
+                if(ele.name === item.OperationName) {
+                  ele.symbolSize = item.symbolSize
+                  ele.TotalSaleAmt = item.TotalSaleAmt
+                  ele.searchId = item.OperationID
+                  ele.OperationID = item.OperationID
+                  return ele
+                }
+                _.forEach(item.StoreSale, (elem) => {
+                  if(ele.name === elem.StoreName){
+                    ele.symbolSize = elem.symbolSize
+                    ele.TotalSaleAmt = elem.TotalSaleAmt
+                    ele.searchId = elem.StoreID
+                    return ele
+                  }
+                })
+              })
+            })
+          });
+          yield put({ type: '_floorStoreSaleSucc', payload: { Data: { floorPoint: newfloorPoint, floorSalesVal: FloorSale }}});
+          yield put({ type: '_typeStoreSucc', payload: { Data: { typePoint: newTypePoint, typeSalesVal: OperationSale } } })
+          return {isOver: true}
+      } else {
+        throw floorResponse || typeResponse
+      }
+    },
     *GetFloorStoreSale({ payload }, { call, put, select }) {//飞行图点位数据(基础)
       const response = yield call(GetFloorStoreSale, payload);
-      const { success, Msg, Data, statusCode } = response;
+      const { success, Data } = response;
       const { floorPoint } = yield select(_ => _.deal)
       if(success && Data){
         const { MallSaleAmt, FloorSale } = Data;
+
         const newPoint = produce(floorPoint, nextData => {
           nextData.nodes[0].name = String(numeral(MallSaleAmt).format('0,0'));
           nextData.nodes[0].attributes.name = String(MallSaleAmt);
@@ -255,17 +325,7 @@ export default {
             })
           })
         });
-
         // console.warn("楼层电位分布:", newPoint)
-        // initPoint.nodes.map(_ => {
-        //   if(Number(_.id) === 0){
-        //     _.name = String(numeral(MallSaleAmt).format('0,0'))
-        //     _.attributes = {
-        //       name: String(MallSaleAmt),
-        //     }
-        //     return _
-        //   }
-        // })
         yield put({
           type: '_floorStoreSaleSucc',
           payload: {
@@ -281,34 +341,69 @@ export default {
     },
     *updateFloorCenterSales({ payload }, { call, put, select }){//更新楼层销售值
       const { floorPoint } = yield select(_ => _.deal)
-      const { currentOrder } = payload
-      const newFloorPoint = produce(floorPoint, nextData => {
-        nextData.nodes[0].name = numeral(Number(nextData.nodes[0].attributes.name) + Number(currentOrder)).format('0,0')
-        nextData.nodes[0].attributes.name = String(Number(nextData.nodes[0].attributes.name) + Number(currentOrder))
-      });
-      console.log("newFloorPoint", newFloorPoint)
-      yield put({ type: '_setFloorCenterVal', payload: {Data: newFloorPoint} })
-    },
+      const { CurrentOrder } = payload;
+      // console.warn("floorPoint", floorPoint.nodes)
+      // console.warn("CurrentOrder", CurrentOrder)
 
+      const sumprice = numeral(CurrentOrder.reduce(function (total, currentValue, currentIndex, arr) {
+        return total + currentValue.TotalSaleAmt;
+      }, 0)).format('0[.]00')
+
+      const newPoint = produce(floorPoint, nextData => {
+        nextData.nodes[0].attributes.name = String(Number(nextData.nodes[0].attributes.name) + Number(sumprice))
+        const newNum = nextData.nodes[0].attributes.name
+        nextData.nodes[0].name = numeral(newNum).format('0,0')
+        nextData.nodes.forEach(_ => {
+          CurrentOrder.forEach((e) => {
+            if(e.StoreName === _.name){
+              _.TotalSaleAmt = numeral(Number(_.TotalSaleAmt) + Number(e.TotalSaleAmt)).format('0[.]00')
+              return _
+            }
+            if(_.FloorId && e.FloorId === _.FloorId){
+              _.TotalSaleAmt = numeral(Number(_.TotalSaleAmt) + Number(e.TotalSaleAmt)).format('0[.]00')
+              return _
+            }
+          })
+        })
+      });
+
+      yield put({ type: '_setFloorCenterVal', payload: {Data: newPoint} })
+    },
     *updateTypeCenterSales({ payload }, { call, put, select }){//业态
       const { typePoint } = yield select(_ => _.deal)
-      const { sales } = payload
+      const { CurrentOrder } = payload;
+
+      console.log("typePoint", typePoint)
+      const sumprice = numeral(CurrentOrder.reduce(function (total, currentValue, currentIndex, arr) {
+        return total + currentValue.TotalSaleAmt;
+      }, 0)).format('0[.]00');
+
       const newPoint = produce(typePoint, nextData => {
-        nextData.nodes[0].name = numeral(Number(nextData.nodes[0].attributes.name) + Number(sales)).format('0,0')
-        nextData.nodes[0].attributes.name = String(Number(nextData.nodes[0].attributes.name) + Number(sales))
+        nextData.nodes[0].attributes.name = String(Number(nextData.nodes[0].attributes.name) + Number(sumprice))
+        const newNum = nextData.nodes[0].attributes.name;
+        nextData.nodes[0].name = numeral(newNum).format('0,0');
+
+        nextData.nodes.forEach(_ => {
+          CurrentOrder.forEach((e) => {
+            if(e.StoreName === _.name){
+              _.TotalSaleAmt = numeral(Number(_.TotalSaleAmt) + Number(e.TotalSaleAmt)).format('0[.]00')
+              return _
+            }
+            if(_.OperationID && e.OperationTypeId === _.OperationID){
+              _.TotalSaleAmt = numeral(Number(_.TotalSaleAmt) + Number(e.TotalSaleAmt)).format('0[.]00')
+              return _
+            }
+          })
+        })
       });
       // console.log("改变之后的数据", initPoint)
-      yield put({
-        type: '_setTypeCenterVal',
-        payload: {Data: newPoint}
-      })
+      yield put({ type: '_setTypeCenterVal', payload: {Data: newPoint}})
     },
     *GettypeStoreSale({ payload }, { call, put, select }) {//飞行图点位数据，业态
       const response = yield call(GettypeStoreSale, payload);
-      const { success, Msg, Data, statusCode } = response;
+      const { success, Data } = response;
       const { typePoint } = yield select(_ => _.deal)
       if(success && Data){
-        console.warn("yetai", Data)
         const { MallSaleAmt, OperationSale } = Data;
         const newPoint = produce(typePoint, nextData => {
           nextData.nodes[0].name = String(numeral(MallSaleAmt).format('0,0'))
@@ -350,7 +445,7 @@ export default {
     },
     *GetTypeSaleAnalysis({ payload }, { call, put }) {//业态销售分析
       const response = yield call(GetTypeSaleAnalysis, payload);
-      const { success, Msg, Data, statusCode } = response;
+      const { success, Data } = response;
       let LegendData = [],
         totalSeries = [],
         salesSeries = [];
@@ -384,13 +479,12 @@ export default {
     },
     *GetStoresRankInfo({ payload }, { call, put }) {//查询商铺实时交易排序数据
       const response = yield call(GetStoresRankInfo, payload);
-      const { success, Msg, Data, statusCode } = response;
+      const { success, Data } = response;
       let numOne = {},
           numTwo = {},
           numThree = {},
           otherList = [];
       if(success && Data){
-        // console.log("Data: ", Data)
         Data.forEach((e, i) => {
           if(i === 0){
             numOne = {
@@ -420,26 +514,48 @@ export default {
             otherList.push(e)
           }
         })
-
-
-        yield put({
-          type: '_storesRankSucc',
-          payload: {Data: {numOne, numTwo, numThree, otherList}},
-        })
+        yield put({ type: '_storesRankSucc', payload: {Data: {numOne, numTwo, numThree, otherList}}})
       } else {
         throw response
       }
     },
+    // *_getResourcesNOParameter({ payload }, { call, put }) {//获取数据不带参数集合
+    //
+    //   const TimeInterval = yield call(GetdealTimeInterval);
+    //   const SalesTrend = yield call(GetdealSalesTrend);
+    //
+    //   const { success, Data } = TimeInterval;
+    //
+    //   let CustSaleAmt = [],
+    //     DateTime = [],
+    //     PersonCount = [],
+    //     NoCustSaleAmt = [];
+    //   if(TimeInterval.success && TimeInterval.Data && SalesTrend.success && SalesTrend.Data){
+    //
+    //     TimeInterval.Data.forEach((_) => {
+    //       DateTime.push(moment(_.DateTime).format('YYYY.MM.DD HH:MM'))
+    //       CustSaleAmt.push(_.CustSaleAmt)
+    //       PersonCount.push(_.PersonCount)
+    //       NoCustSaleAmt.push(_.NoCustSaleAmt)
+    //     });
+    //     yield put({ type: '_timeIntervalSucc', payload: {Data: {DateTime, CustSaleAmt, PersonCount, NoCustSaleAmt}}});
+    //
+    //
+    //   } else {
+    //     throw {message: '服务器错误'}
+    //   }
+    //
+    // },
     *getDealTimeInterval({ payload }, { call, put }) {//销售时段
       const response = yield call(GetdealTimeInterval);
-      const { success, Msg, Data, statusCode } = response;
+      const { success, Data } = response;
       let CustSaleAmt = [],
         DateTime = [],
         PersonCount = [],
         NoCustSaleAmt = [];
       if(success && Data){
         Data.forEach((_) => {
-          DateTime.push(moment(_.DateTime).format('YYYY.MM.DD HH:MM'))
+          DateTime.push(moment(_.DateTime).format('HH:mm'))
           CustSaleAmt.push(_.CustSaleAmt)
           PersonCount.push(_.PersonCount)
           NoCustSaleAmt.push(_.NoCustSaleAmt)
@@ -454,18 +570,16 @@ export default {
     },
     *getSalesTrend({ payload }, { call, put }) {//销售趋势
       const response = yield call(GetdealSalesTrend);
-      const { success, Msg, Data, statusCode } = response;
+      const { success, Data } = response;
       let BizDate = [],
         CustSaleAmt = [],
         GuestCount = [],
         NoCustSaleAmt = [];
-
       if(success && Data){
-        // console.log("销售趋势", Data)
         Data.forEach((_) => {
-          GuestCount.push(_.GuestCount)
-          CustSaleAmt.push(_.CustSaleAmt)
-          NoCustSaleAmt.push(_.NoCustSaleAmt)
+          GuestCount.push(numeral(_.GuestCount).format('0[.]00'))
+          CustSaleAmt.push(numeral(_.CustSaleAmt).format('0[.]00'))
+          NoCustSaleAmt.push(numeral(_.NoCustSaleAmt).format('0[.]00'))
           BizDate.push(moment(_.BizDate).format('YYYY.MM.DD'))
         });
         yield put({
@@ -476,15 +590,68 @@ export default {
         throw response
       }
     },
-    *GetStoreslivingInfo({ payload }, { call, put, select }) {//订单实时数据，处理交互动画逻辑
+    *GetStoreslivingInfo({ payload }, { call, put, select, take }) {//订单实时数据，处理交互动画逻辑
       const response = yield call(GetStoreslivingInfo, payload);
+      const { typeSalesVal, typePoint, floorSalesVal, floorPoint, floorEffect } = yield select(_ => _.deal)
       const { success, Data } = response;
       if(success && Data){
-        const newData =  _.orderBy(Data, ['BillTime'], ['asc'])
-        yield put({
-          type: '_storeslivingInfoSucc',
-          payload: {Data: {storesliving: newData}}
-        })
+        const newData =  _.orderBy(Data, ['BillTime'], ['asc']);
+        // let initIndex = -1;
+        // let initSumprice = 0;
+        // const newArr = _.chunk(Data, 5);
+        yield put({ type: '_storeslivingInfoSucc', payload: {Data: {storesliving: newData}} });
+        // while(true){
+        //   let target = [],
+        //     source = [],
+        //     center = [],
+        //     effect = [],
+        //     getfloorid = [];
+        //   yield call(delay, 3000);
+        //   ++initIndex;
+        //   let currentOrder = newArr[initIndex]
+        //   if(currentOrder){
+        //     _.forEach(floorSalesVal, (el, j) => {
+        //       _.forEach(currentOrder, (e, i) => {
+        //         if (el.FloorId === e.FloorId) getfloorid.push(el)
+        //       })
+        //     });
+        //
+        //     _.forEach(floorPoint.nodes, (item, index) => {//匹配绑定店铺
+        //       _.forEach(getfloorid, (e, i) => {
+        //         if (item.name === e.FloorName + 'F') target.push({ ...item })
+        //       })
+        //       _.forEach(currentOrder, (e, i) => {
+        //         if (item.name === e.StoreName) source.push(item)
+        //       })
+        //     });
+        //     const newTarget = _.uniq(target);
+        //     if (source.length !== 0 && target.length !== 0){
+        //       center = floorPoint.nodes.filter(_ => _.id === '0'); //中心点
+        //       _.forEach(floorPoint.edges, (el, j) => {
+        //         _.forEach(source, (ele, i) => {
+        //           _.forEach(target, (o, p) => {
+        //             if(el.source === ele.id && el.target === o.id){
+        //               effect.push(
+        //                 { "period": 1, "delay": 10, "data": [{"coords":[ele.value, o.value]}]},
+        //                 { "period": 1.6, "delay": 900, "data": [{"coords":[o.value, center[0].value]}]}
+        //               );
+        //             }
+        //           });
+        //         });
+        //       });
+        //     }
+        //
+        //     let NewfloorEffect = produce(floorEffect, nextData => {
+        //       nextData.center = center
+        //       nextData.target = newTarget
+        //       nextData.effect = effect
+        //       nextData.source = source
+        //     })
+        //
+        //
+        //     yield put({ type: "_setFloorEffect", payload: { floorEffect: NewfloorEffect, currentOrder }})
+        //   }
+        // }
       } else {
         throw response
       }
@@ -525,7 +692,7 @@ export default {
     *updateFatherVal({ payload }, { call, put, select }) {
       const { typeSalesVal, floorSalesVal } = yield select(_ => _.deal)
       const { Data } = payload;
-      const { FloorId, TotalSaleAmt, StoreName, OperationTypeId } = Data;
+      const { FloorId, TotalSaleAmt, OperationTypeId } = Data;
 
       let initFloorSalesVal = [];
       let initTypeSalesVal = [];
@@ -617,7 +784,7 @@ export default {
     },
     _setFloorCenterVal(state, { payload }){
       const { Data } = payload
-      return { ...state, floorPoint: Data,  }
+      return { ...state, floorPoint: Data  }
     },
     _setTypeCenterVal(state, { payload }){
       const { Data } = payload
@@ -637,9 +804,17 @@ export default {
     },
     _setCurrentOrder(state, { payload }){//设置当前订单
       const { currentOrder } = payload
+      console.log("前端订单数", currentOrder)
       return { ...state, currentOrder }
     },
-
+    _setFloorEffect(state, { payload }){//设置当前订单
+      const { floorEffect } = payload
+      return { ...state, floorEffect }
+    },
+    _setTypeEffect(state, { payload }){//设置当前订单
+      const { typeEffect } = payload
+      return { ...state, typeEffect }
+    },
 
   }
 }

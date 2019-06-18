@@ -5,17 +5,27 @@ import floorOne from './json/one';
 import Modal from '../modal'
 import _ from 'lodash'
 import moment from 'moment'
-// import { filterData } from 'utils'
 import {connect} from 'dva';
 import PropTypes from 'prop-types';
-// import { shallowEqualImmutable } from 'react-immutable-render-mixin';
-
+import { produce } from 'immer';
+import shortid from 'shortid';
 const { path, polygon, rect } = floorOne;
+
+/**
+ * 公共方法更新state
+ * */
+const _updateState = (state, key = [], value = []) => {
+  return produce(state, draft => {
+    key.forEach((e, i) => {
+      draft[e] = value[i]
+    })
+  });
+};
+
 @connect(({globalData, data}) => ({globalData, data}))
 class One extends Component {
-  Viewer = null;
-  wrapper = null;
-  svgwarp = null;
+  Viewer = React.createRef();
+  wrapper = React.createRef();
   state = {
     tool: "auto",
     value: INITIAL_VALUE,
@@ -24,32 +34,40 @@ class One extends Component {
     visible: false,
   }
 
+
   componentDidMount() {
-    this.Viewer.fitToViewer("center", "center");
-    const width = this.wrapper.clientWidth
-    const height = this.wrapper.clientHeight
-    this.setState({width, height})
+    this.Viewer.current && this.Viewer.current.fitToViewer("center", "center");
+    // this.Viewer.current && this.fitSelection()
+    const width = this.wrapper.current.clientWidth;
+    const height = this.wrapper.current.clientHeight;
+    // const nextState = _updateState(this.state, ["width", "height"], [width, height]);
+    this.setState({width, height});
+    // this.setState(nextState);
   }
 
-  changeTool(nextTool) {
+
+  changeTool = (nextTool) => {
     this.setState({tool: nextTool})
+    // const nextState = _updateState(this.state, ["tool"], [nextTool]);
+    // this.setState(nextState);
   }
 
-  changeValue(nextValue) {
-    // console.log("nextValue", nextValue)
+  changeValue = (nextValue) => {
     this.setState({value: nextValue})
+    // const nextState = _updateState(this.state, ["value"], [nextValue]);
+    // this.setState(nextState);
   }
 
   fitToViewer() {
-    this.Viewer.fitToViewer()
+    this.Viewer.current.fitToViewer("center", "center")
   }
 
   fitSelection() {
-    this.Viewer.fitSelection(40, 40, 200, 200)
+    this.Viewer.current.fitSelection(440, 440, 23, 23)
   }
 
   zoomOnViewerCenter() {
-    this.Viewer.zoomOnViewerCenter(1)
+    this.Viewer.current.zoomOnViewerCenter(1)
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -58,6 +76,7 @@ class One extends Component {
     }
     return false
   }
+
 
   _getStoreInfo = (e) => {
     const StoreID = e.originalEvent.target.getAttribute("data-storeid");
@@ -72,17 +91,18 @@ class One extends Component {
       dispatch({type: 'data/GetStoreCompareInfo', payload})
       dispatch({type: 'data/GetStoreSale', payload})
       dispatch({type: 'data/GetStoreSequential', payload: IncomeForm})
-      this.setState({visible: true});
+      const nextState = _updateState(this.state, ["visible"], [true]);
+      this.setState(nextState);
     }
   }
 
   handleCancel = (e) => {
-    this.setState({ visible: false });
+    const nextState = _updateState(this.state, ["visible"], [false]);
+    this.setState(nextState);
   }
 
   render() {
-    const { width, height, visible } = this.state;
-
+    const { width, height, visible, tool, value } = this.state;
     const {
       GetStoreSale,
       DefaultStoreIsShowDoorNum,
@@ -92,10 +112,11 @@ class One extends Component {
       EmptyStoreShowOtherInfo,
       currentKey,
       } = this.props;
+
     let selectPath = [];
     let selectPolygon = [];
     let selectRect = [];
-    // let unSelectPath = [];
+
     _.forEach(GetStoreSale, (item, index) => {
       _.forEach(path, (ele, i) => {
         if(ele.doorNum.num === item.BIStoreLocationNum){
@@ -191,27 +212,26 @@ class One extends Component {
         }
       })
     });
-    // unSelectPath = filterData(path, selectPath)
-    // console.log("我被渲染了一次")
+
     return (
       <Fragment>
-        <div className={styles.wrapper} ref={_ => this.wrapper = _}>
+        <div className={styles.wrapper} style={{width: "100%", height: "100%"}} ref={this.wrapper}>
           <ReactSVGPanZoom
             width={width}
             height={height}
             background={"#0C0028"}
             SVGBackground={"#0C0028"}
-            ref={Viewer => this.Viewer = Viewer}
-            tool={this.state.tool}
+            ref={this.Viewer}
+            tool={tool}
             detectAutoPan={false}
             toolbarProps={{position: 'none'}}
             miniatureProps={{position: 'none'}}
             onChangeTool={tool => this.changeTool(tool)}
-            value={this.state.value}
-            onChangeValue={value => this.changeValue(value)}
+            value={value}
+            onChangeValue={this.changeValue}
             onClick={this._getStoreInfo}
           >
-            <svg width={510} height={626} viewBox="0 0 507.3 626" className={styles.svg}>
+            <svg width={510} height={600} viewBox="0 0 507.3 626" className={styles.svg}>
               <g className="no">
                 <path className={styles.st0} d="M507.3,81.3L480.8,0.8h-216c0,0-56.1-9-97.1,31.7c-40.9,40.7-40.9,83.5-40.9,83.5s-0.7,58-17.8,99.3
 		c-13.6,32.9-50.1,65.4-67.9,79.9c-7.7,6.3-15.2,13.1-22.4,20.5L0,335.1V425l28.2,54.6v127.7c0,10.4,6.5,18.7,14.5,18.7h346l30.3-30
@@ -282,7 +302,6 @@ class One extends Component {
                       y={_.rect.y}
                       width={_.rect.width}
                       height={_.rect.height}
-                      // fill={`${currentKey ? '#1f204d' : '#2a2d65'}`}
                       fill={`${ currentKey ? currentKey === '356' ? '#2a2d65'  : '#1f204d' : '#2a2d65'}`}
                     />
                     <text
@@ -314,12 +333,49 @@ class One extends Component {
                     <text
                       transform={_.numTrans}
                       fill={_.fillText}
+                      data-storeid={_.storeid}
+                      style={{cursor: 'pointer'}}
                     >
                       { DefaultStoreIsShowDoorNum === 1 ? _.num : ''}
                     </text>
                     <text
                       transform={_.textTrans}
                       fill={_.fillText}
+                      data-storeid={_.storeid}
+                      style={{cursor: 'pointer'}}
+                    >
+                      { DefaultStoreIsShowStoreName === 1 ? _.text : ''}
+                    </text>
+                  </g>
+                })
+              }
+
+              {
+                selectRect.map((_, i) => {
+                  return <g key={i} fill="#fff">
+                    <rect
+                      x={_.x}
+                      y={_.y}
+                      width={_.width}
+                      height={_.height}
+                      fill={_.fillcolor || '#2a2d65'}
+                      data-storeid={_.storeid}
+                      data-degreeid={_.DegreeID}
+                      style={{cursor: 'pointer'}}
+                    />
+                    <text
+                      transform={_.numTrans}
+                      fill={_.fillText}
+                      data-storeid={_.storeid}
+                      style={{cursor: 'pointer'}}
+                    >
+                      { DefaultStoreIsShowDoorNum === 1 ? _.num : ''}
+                    </text>
+                    <text
+                      transform={_.textTrans}
+                      fill={_.fillText}
+                      data-storeid={_.storeid}
+                      style={{cursor: 'pointer'}}
                     >
                       { DefaultStoreIsShowStoreName === 1 ? _.text : ''}
                     </text>
@@ -339,41 +395,16 @@ class One extends Component {
                     <text
                       transform={_.numTrans}
                       fill={_.fillText}
-                    >
-                      { DefaultStoreIsShowDoorNum === 1 ? _.num : ''}
-                    </text>
-                    <text
-                      transform={_.textTrans}
-                      fill={_.fillText}
-                    >
-                      { DefaultStoreIsShowStoreName === 1 ? _.text : ''}
-                    </text>
-                  </g>
-                })
-              }
-              {
-                selectRect.map((_, i) => {
-                  return <g key={i} fill="#fff">
-                    <rect
-                      x={_.x}
-                      y={_.y}
-                      width={_.width}
-                      height={_.height}
-                      fill={_.fillcolor || '#2a2d65'}
                       data-storeid={_.storeid}
-                      data-degreeid={_.DegreeID}
                       style={{cursor: 'pointer'}}
-                    />
-                    <text
-                      transform={_.numTrans}
-                      fill={_.fillText}
                     >
                       { DefaultStoreIsShowDoorNum === 1 ? _.num : ''}
                     </text>
                     <text
                       transform={_.textTrans}
                       fill={_.fillText}
-                      className="st2 st3 st4"
+                      data-storeid={_.storeid}
+                      style={{cursor: 'pointer'}}
                     >
                       { DefaultStoreIsShowStoreName === 1 ? _.text : ''}
                     </text>

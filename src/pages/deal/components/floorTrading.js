@@ -1,12 +1,11 @@
-import React, { PureComponent } from 'react'
-import { connect } from 'dva'
-import styled, { keyframes } from 'styled-components'
-import { Recharts, Components } from 'react-component-echarts'
-import { Empty } from 'antd'
-import EmptyIma from 'assets/Empty.svg'
-import config from 'utils/config'
-import numeral from 'numeral'
-const { TextStyle, Label, Tooltip, Legend, Series } = Components
+import React from 'react';
+import styled from 'styled-components';
+import { Recharts, Components } from 'react-component-echarts';
+import { Empty } from 'antd';
+import EmptyIma from 'assets/Empty.svg';
+import config from 'utils/config';
+import numeral from 'numeral';
+const { TextStyle, Label, Tooltip, Legend, Series } = Components;
 
 const StyledDiv = styled.div`
   position: relative;
@@ -18,7 +17,7 @@ const EmptyWarp = styled.div`
 
 export default (props) => {
   const formatter = (name, data) => {
-    const newArr = data.filter(_ => _.name === name)
+    const newArr = data.filter(_ => _.name === name);
     const len = newArr[0].name.length;
     return len === 2 ? `${newArr[0].name}    ${numeral(newArr[0].value).format('0,0')}` : `${newArr[0].name}   ${numeral(newArr[0].value).format('0,0')}`
   }
@@ -44,7 +43,7 @@ export default (props) => {
               type="pie"
               center={['60%', '50%']}
               radius={["20%","40%"]}
-              itemStyle={{"normal":{"borderColor":"#090237","borderWidth":3}}}
+              itemStyle={{"normal":{"borderColor":"#090237","borderWidth":2}}}
               data={props.totalSeries}
             >
               <Label show={false} />
@@ -54,11 +53,8 @@ export default (props) => {
                     itemStyle={{"normal":{"borderColor":"#090237","borderWidth":3}}}
                     data={props.salesSeries}>
               <Label normal={{
-                "formatter":"{b|{b}}\n{hr|}\n{c|{c}元}",
-                "rich":{"b":{"fontSize":12,"align":"left","padding":4},
-                  "hr":{"borderColor":"#12EABE","width":"100%","borderWidth":1,"height":0},
-                  "d":{"fontSize":12,"align":"left","padding":4},
-                  "c":{"fontSize":12,"align":"center","padding":4}}}}
+                "formatter":"{b},{c}元"
+              }}
               />
             </Series>
           </Recharts>

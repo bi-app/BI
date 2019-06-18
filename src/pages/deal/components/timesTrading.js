@@ -56,7 +56,7 @@ export default (props) => {
               </AxisLine>
               <AxisLabel color="#fff" fontSize={10} />
             </XAxis>
-            <YAxis type="value" name="（万元）" nameGap={16} min={0}>
+            <YAxis type="value" name="（元）" nameGap={16} min={0}>
               <NameTextStyle padding={[0,45,5,0]} />
               <AxisTick show={false} />
               <AxisLine show={true}>
@@ -74,9 +74,9 @@ export default (props) => {
               <SplitLine show={false} />
               <AxisLabel color="#fff" fontSize={10} />
             </YAxis>
-            <Series name="会员销售" type="bar" barWidth={12} data={props.CustSaleAmt} />
-            <Series name="非会员销售" type="bar" barWidth={12} data={props.NoCustSaleAmt} />
-            <Series name="客流" type="line" yAxisIndex={1} smooth={true} symbol="circle" symbolSize={6} showSymbol={true} data={props.PersonCount} />
+            <Series z={3}  name="客流" type="line" yAxisIndex={1} smooth={true} symbol="circle" symbolSize={6} showSymbol={true} data={props.PersonCount} />
+            <Series z={2} stack="销售" name="会员销售" type="bar" barWidth={30} data={props.CustSaleAmt} />
+            <Series z={1} stack="销售" name="非会员销售" type="bar"  barWidth={30} data={props.NoCustSaleAmt} />
           </Recharts>
       }
 

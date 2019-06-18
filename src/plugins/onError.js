@@ -1,8 +1,8 @@
 import { message, notification } from 'antd'
 message.config({
-  top: 100,
-  maxCount: 2,
-  duration: 100000
+  top: 120,
+  maxCount: 1,
+  // duration: 100000
 });
 notification.config({
   top: 50,
@@ -10,13 +10,9 @@ notification.config({
 });
 
 export default {
-  onError(e) {
+  onError(e, dispatch) {
     e.preventDefault()
     if(e.message)
-    // message.error(e.message)
-    notification["error"]({
-      message: e.message,
-      description: '',
-    });
+    notification["error"]({ message: e.message, description: '', });
   },
 }

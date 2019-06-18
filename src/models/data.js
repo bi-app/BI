@@ -15,7 +15,7 @@ import {
   GetStoreSaleByFloorID,
   GetStoreEarningByFloorID,
 } from 'api';
-import { pathMatchRegexp } from 'utils';
+import { pathMatchRegexp, _cycleDate } from 'utils';
 import moment from 'moment';
 import _ from 'lodash'
 
@@ -23,8 +23,8 @@ export default {
   namespace: 'globalData',
   state: {
     rangeDate: [moment(), moment()],
-    StartDate: moment(),
-    EndDate: moment(),
+    StartDate: _cycleDate(),
+    EndDate: _cycleDate(),
     FloorID: '4fae338e-102e-457c-897c-a0b1d6b79aa3',
     FloorName: '',
     showType: '1',
@@ -47,7 +47,7 @@ export default {
     incomeChart: [],
     PassengerData: {
       TotalPassengerFlowCount: 0,
-      SequentialValue: '',
+      SequentialValue: 0,
       PaidPercent: 0,
       CarInCount: 0
     },
@@ -57,7 +57,10 @@ export default {
       CustPercentAmt: 0,
       CustConsumeAmt: 0
     },
-    MemberChart: [],
+    MemberChart: {
+      SeriesData: [],
+      XAxisData: []
+    },
     TypeIncomeInfo: [],
     TypeSalesInfo: [],
     FloorSale: {
@@ -90,7 +93,6 @@ export default {
           // const StartDate = moment().format('YYYY-MM')
           // const EndDate = moment().format('YYYY-MM')
           // const payload = location.query.StartDate ? location.query : { StartDate, EndDate }
-
           // dispatch({ type: 'getSalesChart', payload })
           // dispatch({ type: 'getIncome', payload })
           // dispatch({ type: 'getIncomeChart', payload })
@@ -107,10 +109,7 @@ export default {
       const response = yield call(getSales, payload);
       const { success, Msg, Data, statusCode } = response;
       if(success && Data){
-        yield put({
-          type: 'querySuccess',
-          payload: { Data },
-        })
+        yield put({ type: 'querySuccess', payload: { Data }, })
       } else {
         throw response
       }
@@ -127,12 +126,7 @@ export default {
         });
         yield put({
           type: 'salesChartSucc',
-          payload: {
-            Data: {
-              XAxisData,
-              SeriesData
-            }
-          },
+          payload: { Data: { XAxisData, SeriesData }}
         })
       } else {
         throw response
@@ -141,12 +135,7 @@ export default {
     *getIncome({ payload = {} }, { call, put }) {
       const response = yield call(getIncome, payload);
       const { success, Msg, Data, statusCode } = response;
-      if(success && Data){
-        yield put({
-          type: 'IncomeSucc',
-          payload: {Data},
-        })
-      } else {
+      if(success && Data){yield put({ type: 'IncomeSucc', payload: {Data}, })} else {
         throw response
       }
     },
@@ -157,12 +146,7 @@ export default {
         const res = Data.map((_) => {
           return {name: _.ChargeType, value: _.TotalSaleAmt}
         });
-        yield put({
-          type: 'IncomeChartSucc',
-          payload: {
-            Data: res
-          },
-        })
+        yield put({ type: 'IncomeChartSucc', payload: { Data: res }, })
       } else {
         throw response
       }
@@ -171,12 +155,7 @@ export default {
       const response = yield call(getPassenger, payload);
       const { success, Msg, Data, statusCode } = response;
       if(success && Data){
-        yield put({
-          type: 'PassengerSucc',
-          payload: {
-            Data
-          },
-        })
+        yield put({ type: 'PassengerSucc', payload: { Data }})
       } else {
         throw response
       }
@@ -185,12 +164,7 @@ export default {
       const response = yield call(getMember, payload);
       const { success, Msg, Data, statusCode } = response;
       if(success && Data){
-        yield put({
-          type: 'MemberSucc',
-          payload: {
-            Data
-          },
-        })
+        yield put({ type: 'MemberSucc', payload: { Data }, })
       } else {
         throw response
       }
@@ -207,12 +181,7 @@ export default {
         });
         yield put({
           type: 'MemberChartSucc',
-          payload: {
-            Data: {
-              XAxisData,
-              SeriesData
-            }
-          },
+          payload: { Data: { XAxisData, SeriesData }},
         })
       } else {
         throw response
@@ -229,10 +198,7 @@ export default {
             value: _.NetChargeAmount,
           })
         });
-        yield put({
-          type: 'TypeIncomeSucc',
-          payload: {Data: TypeIncomeInfo},
-        })
+        yield put({ type: 'TypeIncomeSucc', payload: {Data: TypeIncomeInfo}})
       } else {
         throw response
       }
@@ -248,10 +214,7 @@ export default {
             value: _.SaleAmt,
           })
         });
-        yield put({
-          type: 'TypeSalesSucc',
-          payload: {Data: TypeSalesInfo},
-        })
+        yield put({ type: 'TypeSalesSucc', payload: {Data: TypeSalesInfo}})
       } else {
         throw response
       }
@@ -260,10 +223,7 @@ export default {
       const response = yield call(getFloorSale, payload);
       const { success, Msg, Data, statusCode } = response;
       if(success && Data){
-        yield put({
-          type: 'FloorSaleSucc',
-          payload: {Data},
-        })
+        yield put({ type: 'FloorSaleSucc', payload: {Data}})
       } else {
         throw response
       }
@@ -296,9 +256,11 @@ export default {
       const response = yield call(getDegreeList, payload);
       const { success, Msg, Data, statusCode } = response;
       if(success && Data){
+        // const newData = Object.assign([], Data)
+        // const newResult = _.orderBy(newData, 'DegreeID', 'asc');
         yield put({
           type: 'DegreeListSucc',
-          payload: {Data},
+          payload: {Data: Data},
         })
       } else {
         throw response
@@ -434,15 +396,11 @@ export default {
     },
     _updateMonthStart(state, { payload }) {
       const { StartDate } = payload
-      return {
-        ...state, StartDate,
-      }
+      return { ...state, StartDate }
     },
     _updateMonthEnd(state, { payload }) {
       const { EndDate } = payload
-      return {
-        ...state, EndDate,
-      }
+      return { ...state, EndDate }
     },
   },
 }

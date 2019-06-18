@@ -57,7 +57,6 @@ class Three extends Component {
   }
 
   _getStoreInfo = (e) => {
-    console.log(e.originalEvent.target.getAttribute("data-storeid"))
     const StoreID = e.originalEvent.target.getAttribute("data-storeid");
     const { dispatch, globalData: {rangeDate, StartDate, EndDate}} = this.props;
     const Start = moment(StartDate).format('YYYY-MM')
@@ -201,7 +200,6 @@ class Three extends Component {
         }
       })
     });
-    console.log("我被渲染了一次")
     return (
       <Fragment>
         <div className={styles.wrapper} ref={_ => this.wrapper = _}>
@@ -300,8 +298,16 @@ class Three extends Component {
                 selectPath.map((_, i) => {
                   return <g key={i} fill="#fff">
                     <path d={_.d} fill={_.fillcolor || '#2a2d65'} style={{cursor: 'pointer'}} data-storeid={_.storeid} />
-                    <text transform={_.numTrans} fill={_.fillText}>{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
-                    <text transform={_.textTrans} fill={_.fillText}>{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
+                    <text
+                      transform={_.numTrans}
+                      data-storeid={_.storeid}
+                      style={{cursor: 'pointer'}}
+                      fill={_.fillText}>{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
+                    <text
+                      transform={_.textTrans}
+                      data-storeid={_.storeid}
+                      style={{cursor: 'pointer'}}
+                      fill={_.fillText}>{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
                   </g>
                 })
               }
@@ -309,8 +315,17 @@ class Three extends Component {
                 selectPolygon.map((_, i) => {
                   return <g key={i} fill="#fff">
                     <polygon points={_.points} style={{cursor: 'pointer'}} fill={_.fillcolor || '#2a2d65'} data-storeid={_.storeid}/>
-                    <text transform={_.numTrans} fill={_.fillText}>{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
-                    <text transform={_.textTrans} fill={_.fillText}>{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
+                    <text
+                      transform={_.numTrans}
+                      fill={_.fillText}
+                      data-storeid={_.storeid}
+                      style={{cursor: 'pointer'}}
+                    >{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
+                    <text
+                      transform={_.textTrans}
+                      data-storeid={_.storeid}
+                      style={{cursor: 'pointer'}}
+                      fill={_.fillText}>{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
                   </g>
                 })
               }
@@ -326,8 +341,16 @@ class Three extends Component {
                       data-storeid={_.storeid}
                       style={{cursor: 'pointer'}}
                     />
-                    <text transform={_.numTrans} fill={_.fillText}>{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
-                    <text transform={_.textTrans} fill={_.fillText}>{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
+                    <text
+                      transform={_.numTrans}
+                      data-storeid={_.storeid}
+                      style={{cursor: 'pointer'}}
+                      fill={_.fillText}>{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
+                    <text
+                      transform={_.textTrans}
+                      data-storeid={_.storeid}
+                      style={{cursor: 'pointer'}}
+                      fill={_.fillText}>{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
                   </g>
                 })
               }

@@ -2,23 +2,28 @@ import { resolve } from 'path'
 // ref: https://umijs.org/config/
 export default {
   // treeShaking: true,
-  publicPath: '/build/dist/', // /build/dist/ | http://cdn.com/foo
+  publicPath: '/build/', // /build/dist/ | http://cdn.com/foo
   history: 'hash',
-  ignoreMomentLocale: true,
+  ignoreMomentLocale: true,//忽略 moment 的 locale 文件，用于减少尺寸。
   targets: { ie: 9 },
+  outputPath: './build',
+  hash: true,//开启 hash 文件后缀
   plugins: [
     // ref: https://umijs.org/plugin/umi-plugin-react.html
     ['umi-plugin-react', {
       antd: true,
       dva: {
-        immer: true
+        immer: true,
       },
       dynamicImport: {
         webpackChunkName: true,
         loadingComponent: './components/Loader',
       },
       title: 'BI-app',
-      dll: true,
+      dll: {
+        include: ["dva", "dva/router", "dva/saga", "dva/fetch", "antd/es"],
+      },
+      esLint: false,
       // locale: {
       //   enable: true,
       //   default: 'en-US',
@@ -37,7 +42,7 @@ export default {
   theme: './config/theme.config.js',
   proxy: {
     '/api': {
-      target: 'http://192.168.100.171:8010',
+      target: 'http://192.168.100.101:8076',
       changeOrigin: true,
       // pathRewrite: { "^/api" : "" }
     },

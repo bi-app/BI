@@ -1,6 +1,4 @@
 import styles from "./index.less";
-import Link from 'umi/link';
-// import router1 from 'umi/router';
 import { withRouter } from 'umi'
 import { router } from 'utils'
 import React, {PureComponent} from "react";
@@ -9,10 +7,11 @@ import FlipClock from "./components/flipclock"
 import moment from 'moment'
 import {Radio, Button, DatePicker,} from 'antd'
 import MyIcon from '../myicon'
+import Texty from 'rc-texty';
 import _ from 'lodash'
-const { MonthPicker, RangePicker } = DatePicker;
-
-
+const { MonthPicker } = DatePicker;
+import 'rc-texty/assets/index.css';
+import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 
 @withRouter
 @connect(({ app, globalData, loading }) => ({ app, globalData, loading }))
@@ -25,12 +24,14 @@ class Header extends PureComponent {
     startOpen: false,
   }
 
-  onChange = (e) => {
+  onChange = _.debounce((e) => {
     const dealBtnInit = e.target.value;
     const { dispatch } = this.props;
     dispatch({type: 'app/_dealBtnTypeChange', payload: {dealBtnInit}})
-
-  }
+  }, 1000, {
+    leading: true,
+    trailing: false,
+  })
 
   handlePanelChange = (value, mode) => {
     this.setState({
@@ -59,7 +60,6 @@ class Header extends PureComponent {
     dispatch({type: 'globalData/getFloorTrend', payload: payload1})
 
   }
-
 
   handleChange = (value) => {
     const { dispatch, globalData } = this.props
@@ -133,8 +133,8 @@ class Header extends PureComponent {
 
   disabledStartDate = StartDate => {
     const { globalData, app } = this.props;
-    const { EndDate,  } = globalData;
-    const { Biconfig  } = app;
+    const { EndDate } = globalData;
+    const { Biconfig } = app;
     const { MaxDataIntervalMonth  } = Biconfig;
     if (!StartDate || !EndDate) {
       return false;
@@ -142,7 +142,7 @@ class Header extends PureComponent {
     return StartDate.valueOf() > EndDate.valueOf() || StartDate.valueOf() <= moment(EndDate).subtract(Number(MaxDataIntervalMonth),'months').valueOf();
   };
 
-  disabledEndDate = EndDate => {
+  disabledEndDate = (EndDate) => {
     const { globalData, app } = this.props;
     const { StartDate } = globalData;
     const { Biconfig  } = app;
@@ -150,10 +150,15 @@ class Header extends PureComponent {
     if (!EndDate || !StartDate) {
       return false;
     }
-    return EndDate.valueOf() < StartDate.valueOf() || EndDate.valueOf() > moment().valueOf();
+    const pickDate = moment(StartDate).add(MaxDataIntervalMonth, "months");
+    const diff = pickDate.diff(moment(), 'months');//相差
+    if(diff > 0 ){
+      return EndDate.valueOf() < StartDate.valueOf() || EndDate.valueOf() > moment().valueOf()
+    }
+    return EndDate.valueOf() <= StartDate.valueOf() || EndDate.valueOf() > moment(StartDate).add(Number(MaxDataIntervalMonth) - 1, "months").valueOf();
   };
 
-
+  /**开始时间变化设置*/
   onStartChange = value => {
     const { dispatch, globalData } = this.props;
     const { EndDate, FloorID, showType } = globalData;
@@ -164,6 +169,7 @@ class Header extends PureComponent {
     this._getDataByRangeTimes(value, EndDate, FloorID, showType)
   };
 
+  /**结束时间变化设置*/
   onEndChange = value => {
     const { dispatch, globalData, app } = this.props;
     const { StartDate, FloorID } = globalData;
@@ -226,7 +232,6 @@ class Header extends PureComponent {
         dispatch({type: 'globalData/_updateMonthStart', payload: {StartDate}})
         dispatch({type: 'globalData/_updateMonthEnd', payload: {EndDate}});
         this._getDataByRangeTimes(StartDate, EndDate, FloorID, showType)
-
         break;
       case '2':
         const Start = moment().subtract(1, 'month').startOf('month');
@@ -255,7 +260,6 @@ class Header extends PureComponent {
 
   render() {
     const { to, app, globalData } = this.props;
-    const { mode } = this.state;
     const { StartDate, EndDate, } = globalData;
     const { endOpen, startOpen } = this.state;
     const { dealBtnInit, Biconfig } = app;
@@ -286,7 +290,9 @@ class Header extends PureComponent {
           <Button type="link" ghost data-key="1">本月</Button>
           <Button type="link" ghost data-key="2">上月</Button>
         </div>
-      }else if(Num >= 12){
+      }else
+
+      if(Num >= 12){
         return <div className={styles['range-foot-btn']} onClick={this._setRangeTimeByFoot}>
           <Button type="link" ghost data-key="1" >本月</Button>
           <Button type="link" ghost data-key="2" >上月</Button>
@@ -369,11 +375,9 @@ class Header extends PureComponent {
                 null
             }
           </div>
-          <div>
-            <h3 className={styles['title-text']}>
-              <span className={styles['title-text-label']}>{to === '/deal' ? '数据屏' : '交易屏'}</span>
-            </h3>
-          </div>
+          <h3 className={styles['title-text']}>
+            <span className={styles['title-text-label']}>{ to === '/deal' ? '数据屏' : '交易屏'}</span>
+          </h3>
           <div className={styles['bar-flex-right']}>
             <div className={styles['btn-switch']}>
               <MyIcon className={styles['btn-switch-angle1']} type="icon-guaijiao"/>

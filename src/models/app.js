@@ -58,10 +58,10 @@ export default {
     },
 
     setupRequestCancel({ history }) {
-      history.listen((e) => {
+      history.listen((location) => {
         const { cancelRequest = new Map() } = window
         cancelRequest.forEach((value, key) => {
-          if (value.pathname !== window.location.pathname) {
+          if (value.pathname !== location.pathname) {
             value.cancel(CANCEL_REQUEST_MESSAGE)
             cancelRequest.delete(key)
           }
@@ -71,6 +71,7 @@ export default {
 
     setup({ dispatch, history }) {//一进入页面请求
       dispatch({type: 'getBiconfig'})
+
     },
   },
 
@@ -101,7 +102,7 @@ export default {
         if(Data){
           yield put({type: 'BiconfigSucc', payload: {Data}});
           yield put({type: '_updateSaleTypeChange', payload: {showType: String(Data.DefaultFloorShowType)}});
-          yield put({type: 'setRangeDate', payload: {Data: rangeDate(Data)}});
+          // yield put({type: 'setRangeDate', payload: {Data: rangeDate(Data)}});
           yield put({type: '_dealBtnTypeChange', payload: {dealBtnInit: String(Data.DefaultTransScreenShowType)}});
         }else {
           throw response

@@ -16,6 +16,7 @@ const EmptyWarp = styled.div`
 `;
 
 export default (props) => {
+  // console.log("props", props)
   return (
     <Spin spinning={false} delay={500}>
       <StyledDiv>
@@ -33,37 +34,37 @@ export default (props) => {
                   <div className={style['store-warp']}>
                     <i className={style.rank_2}/>
                     <div className={style['store-img']}>
-                      <img src={""} alt=""/>
+                      <img src={props.numTwo.StoreConverImg} alt=""/>
                     </div>
                   </div>
-                  <div className={style['store-name']}><Ellipsis lines={1}>{props.numTwo.StoreName}</Ellipsis></div>
+                  <div className={style['store-name']}><Ellipsis lines={1}>{props.numTwo.StoreName || "暂无店铺"}</Ellipsis></div>
                   <p className={style['store-sale-num']}>{numeral(props.numTwo.BillAmount).format('0,0')}</p>
                 </div>
                 <div className={style['rank-header-num1']}>
                   <div className={style['store-warp']}>
                     <i className={style.rank_1}/>
                     <div className={style['store-img']}>
-                      <img src={""} alt=""/>
+                      <img src={props.numOne.StoreConverImg} alt=""/>
                     </div>
                   </div>
-                  <div className={style['store-name']}><Ellipsis lines={1}>{props.numOne.StoreName}</Ellipsis></div>
+                  <div className={style['store-name']}><Ellipsis lines={1}>{props.numOne.StoreName || "暂无店铺"}</Ellipsis></div>
                   <p className={style['store-sale-num']}>{numeral(props.numOne.BillAmount).format('0,0')}</p>
                 </div>
                 <div className={style['rank-header-num2']}>
                   <div className={style['store-warp']}>
                     <i className={style.rank_3}/>
                     <div className={style['store-img']}>
-                      <img src={""} alt=""/>
+                      <img src={props.numThree.StoreConverImg} alt=""/>
                     </div>
                   </div>
-                  <div className={style['store-name']}><Ellipsis lines={1}>{props.numThree.StoreName}</Ellipsis></div>
+                  <div className={style['store-name']}><Ellipsis lines={1}>{props.numThree.StoreName || "暂无店铺"}</Ellipsis></div>
                   <p className={style['store-sale-num']}>{numeral(props.numThree.BillAmount).format('0,0')}</p>
                 </div>
               </div>
               <div className={style['rank-cont']}>
                 <QueueAnim delay={300} className={style['queue-simple']}>
                   {
-                    props.otherList.map((_, index) => {
+                    props.otherList.length !== 0 ? props.otherList.map((_, index) => {
                       return (
                         <div key={_.StoreID} className={style['rank-list']}>
                           <div className={style['rank-list-index']}>{`NO.${index + 4}`}</div>
@@ -71,7 +72,11 @@ export default (props) => {
                           <div className={style['rank-list-nomal']}>{numeral(_.BillAmount).format('0,0')}</div>
                         </div>
                       )
-                    })
+                    }) : [1,2,3,4,5,6,7].map((_, index) => <div key={_} className={style['rank-list']}>
+                        <div className={style['rank-list-index']}>{`NO.${index + 4}`}</div>
+                        <div className={style['rank-list-nomal']}>暂无店铺</div>
+                        <div className={style['rank-list-nomal']}>0</div>
+                    </div>)
                   }
                 </QueueAnim>
               </div>

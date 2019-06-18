@@ -1,61 +1,42 @@
 /**
  * title: 欢迎登录-中铁建BI决策分析系统
  */
-import React, {PureComponent, Fragment} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'dva'
-import {Button, Row, Form, Input} from 'antd'
-import styles from './index.less'
+import React, {PureComponent, Fragment} from 'react';
+/**
+ * Fragment: 将一些子元素添加到 DOM tree 上且不需要为这些元素提供额外的父节点
+ * */
+import PropTypes from 'prop-types';
+import {connect} from 'dva';
+import {Button, Row, Form, Input} from 'antd';
+import styles from './index.less';
 import logo from 'assets/logo.png';
-import Mobility1 from 'assets/Mobility-1.png';
-import Mobility2 from 'assets/Mobility2.png';
-import WaterBall from '@/components/waterBall';
-const FormItem = Form.Item
-
+import Mobility1 from '@/assets/Mobility-1.png';
+import Mobility2 from '@/assets/Mobility2.png';
+const FormItem = Form.Item;
 
 @connect(({loading, login}) => ({loading, login}))
 @Form.create()
 class Login extends PureComponent {
   handleOk = () => {
-    const {dispatch, form} = this.props
-    const {validateFieldsAndScroll} = form
+    const { dispatch, form } = this.props;
+    console.log("form", form)
+    const { validateFieldsAndScroll } = form;
     validateFieldsAndScroll((errors, values) => {
       if (errors) {
+
         return
       }
       dispatch({type: 'login/login', payload: values})
     })
-  }
-
-  getCircleProps = () =>{
-    let props={
-      idDom:'circleWaterBall2',
-      width:300,
-      height:300,
-      textColor:"#333",
-      waveTextColor:"#ddd",
-      textSize:0.7,
-      title: '哈哈',
-      outerCircle:{
-        r:80,
-        fillColor:'#03C2FF'
-      },
-      innerCircle:{
-        r:80,
-        fillColor:'#00D3F5'
-      }
-    };
-    return props;
-  }
+  };
 
   render() {
-    const {loading, form} = this.props
-    const isLoading = loading.effects['login/login']
-    const {getFieldDecorator} = form
+    const { loading, form } = this.props;
+    const isLoading = loading.effects['login/login'];
+    const { getFieldDecorator } = form;
 
     return (
       <Fragment>
-
         <div className={styles.login_warp}>
           <i className={styles.login_warp_hole_img} />
           <div className={styles.login_form_inner}>
@@ -116,7 +97,6 @@ class Login extends PureComponent {
             </div>
           </div>
         </div>
-
       </Fragment>
     )
   }

@@ -181,12 +181,12 @@ class MinusOne extends Component {
             onChangeValue={value => this.changeValue(value)}
             onClick={this._getStoreInfo}
           >
-            <svg width={850} height={910} viewBox="0 0 843.5 902.6" className={styles.svg}>
+            <svg width={850} height={910} viewBox="0 0 843.5 902.6">
               <g>
-                <path className={styles.st0} d="M422.7,112.7l-452.3-2.1v762.3l841.5,0.1l37-30.4V545.3H873V140.8h-24.1h-71.4l-27.6,0.2H637.8V57.8h-124V29.5
+                <path className={styles.svg_bg} d="M422.7,112.7l-452.3-2.1v762.3l841.5,0.1l37-30.4V545.3H873V140.8h-24.1h-71.4l-27.6,0.2H637.8V57.8h-124V29.5
 		h-91.1L422.7,112.7L422.7,112.7z M504.4,53.3v28.3h123.9v83.2h109.1l52.9-0.2h34.9h27.3v356.9h-24.1l-3.2,297.3l-37,30.4
 		l-795.5-0.1V134.4l447.6,2.1V53.3H504.4L504.4,53.3z"/>
-                <polygon className={styles.st0} points="-4.3,137.5 -4.3,845.9 784.9,846.1 821.9,815.6 821.9,518.3 846,518.3 846,167.7 821.9,167.7
+                <polygon className={styles.svg_bg} points="-4.3,137.5 -4.3,845.9 784.9,846.1 821.9,815.6 821.9,518.3 846,518.3 846,167.7 821.9,167.7
 		790.3,167.7 737.3,167.9 625,167.9 625,84.7 501.1,84.7 501.1,56.5 444.9,56.5 444.9,139.6 	"/>
               </g>
 
@@ -194,16 +194,17 @@ class MinusOne extends Component {
                 polygon.map((_, i) => {
                   return <g key={i} fill="#fff">
                     <polygon
-                      className="st1"
                       points={_.polygon.points}
                       fill={`${ currentKey ? currentKey === '356' ? '#2a2d65'  : '#1f204d' : '#2a2d65'}`}
                     />
                     <text
                       transform={_.doorNum.transform}
+                      className={styles.svg_text_font}
                       fill={`${currentKey ? currentKey === '356' ? '#FFF' : '#7a7c99' : '#fff'}`}
                     >{ EmptyStoreIsShowDoorNum === 1 ? _.doorNum.num : '' }</text>
                     <text
                       transform={_.doortext.transform}
+                      className={styles.svg_text_font}
                       fill={`${currentKey ? currentKey === '356' ? '#FFF' : '#7a7c99' : '#fff'}`}
                     >{ EmptyStoreIsShowOther === 1 ? EmptyStoreShowOtherInfo : '' }</text>
                   </g>
@@ -213,7 +214,6 @@ class MinusOne extends Component {
                 rect.map((_, i) => {
                   return <g key={i} fill="#fff">
                     <rect
-                      className="st1"
                       x={_.rect.x}
                       y={_.rect.y}
                       width={_.rect.width}
@@ -222,10 +222,12 @@ class MinusOne extends Component {
                     />
                     <text
                       transform={_.doorNum.transform}
+                      className={styles.svg_text_font}
                       fill={`${currentKey ? currentKey === '356' ? '#FFF' : '#7a7c99' : '#fff'}`}
                     >{ EmptyStoreIsShowDoorNum === 1 ? _.doorNum.num : '' }</text>
                     <text
                       transform={_.doortext.transform}
+                      className={styles.svg_text_font}
                       fill={`${currentKey ? currentKey === '356' ? '#FFF' : '#7a7c99' : '#fff'}`}
                     >{ EmptyStoreIsShowOther === 1 ? EmptyStoreShowOtherInfo : '' }</text>
                   </g>
@@ -235,15 +237,24 @@ class MinusOne extends Component {
                 selectPolygon.map((_, i) => {
                   return <g key={i} fill="#fff">
                     <polygon
-                      className="st1"
                       points={_.points}
                       style={{cursor: 'pointer'}}
                       fill={_.fillcolor || '#2a2d65'}
                       data-storeid={_.storeid}
                       data-degreeid={_.DegreeID}
                     />
-                    <text transform={_.numTrans} fill={_.fillText}>{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
-                    <text transform={_.textTrans} fill={_.fillText}>{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
+                    <text
+                      data-storeid={_.storeid}
+                      transform={_.numTrans}
+                      fill={_.fillText}
+                      className={styles.svg_text_font}
+                    >{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
+                    <text
+                      data-storeid={_.storeid}
+                      transform={_.textTrans}
+                      fill={_.fillText}
+                      className={styles.svg_text_font}
+                    >{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
                   </g>
                 })
               }
@@ -261,8 +272,18 @@ class MinusOne extends Component {
                       data-degreeid={_.DegreeID}
                       style={{cursor: 'pointer'}}
                     />
-                    <text transform={_.numTrans} fill={_.fillText}>{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
-                    <text transform={_.textTrans} fill={_.fillText}>{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
+                    <text
+                      data-storeid={_.storeid}
+                      transform={_.numTrans}
+                      fill={_.fillText}
+                      className={styles.svg_text_font}
+                    >{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
+                    <text
+                      data-storeid={_.storeid}
+                      transform={_.textTrans}
+                      fill={_.fillText}
+                      className={styles.svg_text_font}
+                    >{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
                   </g>
                 })
               }

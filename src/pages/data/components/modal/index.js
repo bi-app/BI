@@ -1,20 +1,16 @@
 import React, { PureComponent, Fragment } from 'react'
 import { Modal, Tabs, Row, Col, Spin, Empty, Icon } from 'antd';
-import { connect } from 'dva'
-import styles from './index.less'
-import moment from 'moment'
-import EmptyIma from 'assets/Empty.svg'
-import { Recharts, Components } from 'react-component-echarts'
-import config from 'utils/config'
-const { Name, TextStyle, LineStyle, AxisLabel, NameTextStyle, Grid, SplitLine, AxisLine, AxisTick, Legend, Tooltip, XAxis, YAxis, Series } = Components
+import { Recharts, Components } from 'react-component-echarts';
+import { connect } from 'dva';
+import styles from './index.less';
+import EmptyIma from '@/assets/Empty.svg';
+import config from '@/utils/config';
+import PropTypes from 'prop-types';
+const { TextStyle, LineStyle, AxisLabel, NameTextStyle, Grid, SplitLine, AxisLine, AxisTick, Legend, Tooltip, XAxis, YAxis, Series } = Components;
 const TabPane = Tabs.TabPane;
 
-@connect(({ app, globalData, data, loading }) => ({ app, globalData, data, loading }))
-class Trend extends React.PureComponent {
-  callback = (key) => {
-
-  }
-
+@connect(({ loading }) => ({ loading }))
+class RankModal extends PureComponent {
   render() {
     const {
       visible,
@@ -34,11 +30,9 @@ class Trend extends React.PureComponent {
       StoreTypeFun,
       StoreTypeMain,
       loading,
-    } = this.props
-    const { global } = loading
+    } = this.props;
+    const { global } = loading;
     const antIcon = <Icon type="loading" style={{ fontSize: 50 }} spin />;
-
-    // console.warn("收益红榜：", StoreEarningRankYes)
 
     return (
       <Fragment>
@@ -57,7 +51,7 @@ class Trend extends React.PureComponent {
           <i className={styles['modal-border-com'] + ' ' + styles['modal-border-right-top']} />
           <i className={styles['modal-border-com'] + ' ' + styles['modal-border-right-bottom']} />
           <Spin indicator={antIcon} spinning={global} wrapperClassName='modalspinning'>
-            <Tabs className={styles.customTab} onChange={this.callback} type="card">
+            <Tabs className={styles.customTab} type="card">
               <TabPane tab="项目排行榜" key="1" className={styles.tab}>
                 <Row gutter={24}>
                   <Col span={12}>
@@ -105,8 +99,8 @@ class Trend extends React.PureComponent {
                                 </AxisLine>
                                 <AxisLabel show={true} color="#fff" fontSize={10} />
                               </YAxis>
-                              <Series name="会员销售" type="bar" stack="销售" data={projectRankYes.Customer} barWidth="30%" itemStyle={{"color":"#19B462"}} />
-                              <Series name="非会员销售" type="bar" stack="销售" data={projectRankYes.NoCustomer} barWidth="30%" itemStyle={{"color":"#2BDFA0"}} />
+                              <Series name="会员销售" type="bar" stack="销售" data={projectRankYes.Customer} barWidth="30%" itemStyle={{"color":"#FF8160"}} />
+                              <Series name="非会员销售" type="bar" stack="销售" data={projectRankYes.NoCustomer} barWidth="30%" itemStyle={{"color":"#FFDB6C"}} />
                             </Recharts>
                         }
                       </div>
@@ -157,7 +151,7 @@ class Trend extends React.PureComponent {
                                 </AxisLine>
                                 <AxisLabel show={true} color="#fff" fontSize={10} />
                               </YAxis>
-                              <Series name="会员销售" type="bar" stack="销售" data={projectRankNO.Customer} barWidth="30%" itemStyle={{"color":"#7FD4FF"}} />
+                              <Series name="会员销售" type="bar" stack="销售" data={projectRankNO.Customer} barWidth="30%" itemStyle={{"color":"#2ADFA1"}} />
                               <Series name="非会员销售" type="bar" stack="销售" data={projectRankNO.NoCustomer} barWidth="30%" itemStyle={{"color":"#00A5F7"}} />
                             </Recharts>
                         }
@@ -208,7 +202,7 @@ class Trend extends React.PureComponent {
                                 </AxisLine>
                                 <AxisLabel show={true} color="#fff" fontSize={10} />
                               </YAxis>
-                              <Series name="销售坪效" type="bar" data={projectStore.store} barWidth="30%" itemStyle={{"color":"#00BAD6"}} />
+                              <Series name="销售坪效" type="bar" data={projectStore.store} barWidth="30%" itemStyle={{"color":"#FF8160"}} />
                             </Recharts>
                         }
                       </div>
@@ -311,8 +305,8 @@ class Trend extends React.PureComponent {
                                 </AxisLine>
                                 <AxisLabel show={true} color="#fff" fontSize={10} />
                               </YAxis>
-                              <Series name="会员销售" type="bar" stack="销售" data={floorSalesRankYes.Customer} barWidth="30%" itemStyle={{"color":"#19B462"}} />
-                              <Series name="非会员销售" type="bar" stack="销售" data={floorSalesRankYes.NoCustomer} barWidth="30%" itemStyle={{"color":"#2BDFA0"}} />
+                              <Series name="会员销售" type="bar" stack="销售" data={floorSalesRankYes.Customer} barWidth="30%" itemStyle={{"color":"#FF8160"}} />
+                              <Series name="非会员销售" type="bar" stack="销售" data={floorSalesRankYes.NoCustomer} barWidth="30%" itemStyle={{"color":"#FFDB6C"}} />
                             </Recharts>
                         }
                       </div>
@@ -363,7 +357,7 @@ class Trend extends React.PureComponent {
                                 </AxisLine>
                                 <AxisLabel show={true} color="#fff" fontSize={10} />
                               </YAxis>
-                              <Series name="会员销售" type="bar" stack="销售" data={floorSalesRankNo.Customer} barWidth="30%" itemStyle={{"color":"#7FD4FF"}} />
+                              <Series name="会员销售" type="bar" stack="销售" data={floorSalesRankNo.Customer} barWidth="30%" itemStyle={{"color":"#2ADFA1"}} />
                               <Series name="非会员销售" type="bar" stack="销售" data={floorSalesRankNo.NoCustomer} barWidth="30%" itemStyle={{"color":"#00A5F7"}} />
                             </Recharts>
                         }
@@ -414,7 +408,7 @@ class Trend extends React.PureComponent {
                                 </AxisLine>
                                 <AxisLabel show={true} color="#fff" fontSize={10} />
                               </YAxis>
-                              <Series name="销售坪效" type="bar" data={StoreSalePerAreaRankYes.store} barWidth="30%" itemStyle={{"color":"#00BAD6"}} />
+                              <Series name="销售坪效" type="bar" data={StoreSalePerAreaRankYes.store} barWidth="30%" itemStyle={{"color":"#FF8160"}} />
                             </Recharts>
                         }
                       </div>
@@ -517,8 +511,8 @@ class Trend extends React.PureComponent {
                               </AxisLine>
                               <AxisLabel show={true} color="#fff" fontSize={10} />
                             </YAxis>
-                            <Series name="会员销售" type="bar" stack="销售" data={StoreTypeFood.Customer} barWidth="30%" itemStyle={{"color":"#19B462"}} />
-                            <Series name="非会员销售" type="bar" stack="销售" data={StoreTypeFood.NoCustomer} barWidth="30%" itemStyle={{"color":"#2BDFA0"}} />
+                            <Series name="会员销售" type="bar" stack="销售" data={StoreTypeFood.Customer} barWidth="30%" itemStyle={{"color":"#FF8160"}} />
+                            <Series name="非会员销售" type="bar" stack="销售" data={StoreTypeFood.NoCustomer} barWidth="30%" itemStyle={{"color":"#FFDA6D"}} />
                           </Recharts>
                         }
                       </div>
@@ -568,8 +562,8 @@ class Trend extends React.PureComponent {
                               </AxisLine>
                               <AxisLabel show={true} color="#fff" fontSize={10} />
                             </YAxis>
-                            <Series name="会员销售" type="bar" stack="销售" data={StoreTypeFun.Customer} barWidth="30%" itemStyle={{"color":"#7FD4FF"}} />
-                            <Series name="非会员销售" type="bar" stack="销售" data={StoreTypeFun.NoCustomer} barWidth="30%" itemStyle={{"color":"#00A5F7"}} />
+                            <Series name="会员销售" type="bar" stack="销售" data={StoreTypeFun.Customer} barWidth="30%" itemStyle={{"color":"#FF8160"}} />
+                            <Series name="非会员销售" type="bar" stack="销售" data={StoreTypeFun.NoCustomer} barWidth="30%" itemStyle={{"color":"#FFDA6D"}} />
                           </Recharts>
                         }
 
@@ -623,11 +617,10 @@ class Trend extends React.PureComponent {
                                 </AxisLine>
                                 <AxisLabel show={true} color="#fff" fontSize={10} />
                               </YAxis>
-                              <Series name="会员销售" type="bar" stack="销售" data={StoreTypeRetail.Customer} barWidth="30%" itemStyle={{"color":"#00BAD6"}} />
-                              <Series name="非会员销售" type="bar" stack="销售" data={StoreTypeRetail.NoCustomer} barWidth="30%" itemStyle={{"color":"#0FECF2"}} />
+                              <Series name="会员销售" type="bar" stack="销售" data={StoreTypeRetail.Customer} barWidth="30%" itemStyle={{"color":"#FF8160"}} />
+                              <Series name="非会员销售" type="bar" stack="销售" data={StoreTypeRetail.NoCustomer} barWidth="30%" itemStyle={{"color":"#FFDA6D"}} />
                             </Recharts>
                         }
-
                       </div>
                     </div>
                   </Col>
@@ -694,4 +687,24 @@ class Trend extends React.PureComponent {
   }
 }
 
-export default Trend
+RankModal.propTypes = {
+  onOk: PropTypes.func,
+  onCancel: PropTypes.func,
+  visible: PropTypes.bool,
+  width: PropTypes.number,
+  projectRankYes: PropTypes.object,
+  projectRankNO: PropTypes.object,
+  projectStore: PropTypes.object,
+  projectIncome: PropTypes.object,
+  floorSalesRankYes: PropTypes.object,
+  floorSalesRankNo: PropTypes.object,
+  StoreSalePerAreaRankYes: PropTypes.object,
+  StoreEarningRankYes: PropTypes.object,
+  StoreTypeFood: PropTypes.object,
+  StoreTypeRetail: PropTypes.object,
+  StoreTypeFun: PropTypes.object,
+  StoreTypeMain: PropTypes.object,
+  loading: PropTypes.object,
+};
+
+export default RankModal;

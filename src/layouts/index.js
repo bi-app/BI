@@ -8,6 +8,16 @@ import 'moment/locale/zh-cn';
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import BaseLayout from './BaseLayout'
+import 'echarts';
+
+NProgress.configure({ showSpinner: false });//禁用进度环
+// import 'echarts/lib/component/title';
+// import 'echarts/lib/component/tooltip';
+// import 'echarts/lib/component/legend';
+// import 'echarts/lib/chart/line';
+// import 'echarts/lib/chart/pie';
+// import 'echarts/lib/chart/bar';
+// import 'echarts/lib/component/grid';
 moment.locale('zh-cn');
 
 
@@ -18,14 +28,10 @@ class Layout extends PureComponent {
     const { loading, children } = this.props;
     if (loading.global) {
       NProgress.start()
-      // message.loading('请求中...', 0)
     }
-
     if (!loading.global) {
       NProgress.done()
-      // message.destroy()
     }
-    // console.log("taskqueue", taskqueue())
 
     return (
       <LocaleProvider locale={zh_CN}>

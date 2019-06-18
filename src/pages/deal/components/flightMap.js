@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-// import ReactEcharts from 'echarts-for-react'
 import echarts from "echarts"
 import config from 'utils/config'
 //导入组件
@@ -9,134 +8,244 @@ import { immutableRenderDecorator } from 'react-immutable-render-mixin';
 import { Recharts, Components } from 'react-component-echarts';
 import produce from "immer";
 import numeral from 'numeral';
-import { Modal } from 'antd';
+import { Modal, Empty } from 'antd';
+import { connect } from 'dva/index';
+const isEqual = require("react-fast-compare");
 const { XAxis, YAxis, Series, Grid, Tooltip } = Components;
-
+import EmptyIma from '@/assets/Empty.svg'
+import { Timer } from 'utils/Timer';
+import _ from 'lodash';
+let initState = {
+  effect: [],
+  center: [],
+  source: [],
+  target: [],
+}
+let initIndex = 0;
 
 @immutableRenderDecorator
+@connect(({ deal }) => ({ deal }))
 class FlightMap extends Component {
   timer = null;
+  timerID = null;
   echartsRefs = React.createRef();
-  state = {
-    effect: [],
-    center: [],
-    source: [],
-    target: [],
-    storeSales: 0,
-  }
+  state = initState
 
   componentDidMount() {}
 
-  setToolTipSwich = (Instance) => {
-    Instance._api.dispatchAction({ type: 'hideTip' });
-    clearTimeout(this.timer);
-    const { source, target } = this.state;
-    const sourceName = source.length !== 0 && source[0].name;
-    const targetName = target.length !== 0 && target[0].name;
-    Instance._api.dispatchAction({
-      type: 'showTip',
-      name: sourceName,
-      seriesIndex: 0,
-    })
-    this.timer = setTimeout(() => {
-      Instance._api.dispatchAction({
-        type: 'showTip',
-        name: targetName,
-        seriesIndex: 0,
+  update = () => {
+    const { storesliving, floorEffect, typeSalesVal, typePoint  } = this.props.deal
+    const newArr = _.chunk(storesliving, 5);
+    let target = [],
+      source = [],
+      center = [],
+      effect = [],
+      getfloorid = [];
+    let currentOrder = newArr[initIndex]
+    if(initIndex >= newArr.length){
+      this.props.dispatch({
+        type: "deal/_setTypeEffect",
+        payload: {
+          typeEffect: {
+            effect: [],
+            center: [],
+            source: [],
+            target: [],
+          }
+        }
       })
-    }, 1500)
-  }
-
-  formatter = (params,p,a) => {
-    const { typeSalesVal } = this.props;
-    const { storeSales } = this.state;
-    const typeName = params.name;
-    if(typeName === '零售' || typeName === '餐饮' || typeName === '服务配套' || typeName === '主力店'){
-      const getType = typeSalesVal.filter(_ => _.OperationName === typeName);
-      if(getType && getType.length !== 0){
-        return `${params.name} <br/> ${Number(getType[0].TotalSaleAmt)}元`
-      }
-    }else {
-      return `${params.name} <br/> ${storeSales}元`
+      return
     }
-  }
 
-  _autoPlayPointForOrder = (nextProps) => {
-    const { storesliving, typePoint, typeSalesVal, dispatch } = nextProps;
-    if(storesliving[this.props.updateIndex]){
-      const { OperationTypeId, StoreName, TotalSaleAmt } = storesliving[this.props.updateIndex];
-      const getFloorID = typeSalesVal.filter(_ => _.OperationID === OperationTypeId);//获取楼层
-      // console.warn("getFloorID", getFloorID)
-      const center = typePoint.nodes.filter(_ => _.id === '0'); //中心点
-      const source = typePoint.nodes.filter(_ => _.name === StoreName); //起点
-      const target = typePoint.nodes.filter(_ => _.name === (getFloorID && getFloorID.length !== 0 && getFloorID[0].OperationName)); //第一级
-      // console.warn("获取到的楼层数据：", center, source, target)
-      const newTypePoint = produce(typePoint, nextData => {
-        nextData.nodes[0].name = numeral(Number(nextData.nodes[0].attributes.name) + Number(TotalSaleAmt)).format('0,0')
-        nextData.nodes[0].attributes.name = String(Number(nextData.nodes[0].attributes.name) + Number(TotalSaleAmt))
-        nextData.nodes.forEach(_ => {
-          if(_.OperationID === OperationTypeId){
-            _.TotalSaleAmt = _.TotalSaleAmt + TotalSaleAmt
-            return _
-          }
-          if(_.name === StoreName){
-            _.TotalSaleAmt = _.TotalSaleAmt + TotalSaleAmt
-            return _
-          }
-          return _
+    if(currentOrder){
+      _.forEach(typeSalesVal, (el, j) => {
+        _.forEach(currentOrder, (e, i) => {
+          if (el.OperationID === e.OperationTypeId) getfloorid.push(el)
         })
       });
-      // console.warn("------------newFloorPoint|||||||||||", newTypePoint)
-      this.props.dispatch({type: 'deal/_setTypeCenterVal', payload: {Data: newTypePoint}})
 
-      if(center && center.length !== 0 && source && source.length !== 0 && target && target.length !== 0){
-        const effect = [
-          {"period": 1.6, "delay": 10, "data": [{"coords":[source[0].value, target[0].value]}]},
-          {"period": 2, "delay": 1000, "data": [{"coords":[target[0].value, center[0].value]}]}
-        ]
-        this.setState((preState) => ({center, source, target, effect, storeSales: TotalSaleAmt}))
-        dispatch({type: 'deal/updateFloorCenterSales', payload: {sales: TotalSaleAmt}})
-      }else {
-        this.setState({center: [], source:[], target: [], effect: [], storeSales: 0})
+      _.forEach(typePoint.nodes, (item, index) => {//匹配绑定店铺
+        _.forEach(getfloorid, (e, i) => {
+          if(item.name === e.OperationName) target.push({...item})
+        })
+        _.forEach(currentOrder, (e, i) => {
+          if(item.name === e.StoreName) source.push(item)
+        })
+      });
+      const newTarget = _.uniq(target);
+      if (source.length !== 0 && target.length !== 0){
+        center = typePoint.nodes.filter(_ => _.id === '0'); //中心点
+        _.forEach(typePoint.edges, (el, j) => {
+          _.forEach(source, (ele, i) => {
+            _.forEach(target, (o, p) => {
+              if(el.source === ele.id && el.target === o.id){
+                effect.push(
+                  { "period": 1, "delay": 10, "data": [{"coords":[ele.value, o.value]}]},
+                  { "period": 1.6, "delay": 900, "data": [{"coords":[o.value, center[0].value]}]}
+                );
+              }
+            });
+          });
+        });
       }
+
+      if(center.length !== 0 && newTarget.length !== 0 && effect.length !== 0  && source.length !== 0 ){
+        let NewfloorEffect = produce(floorEffect, nextData => {
+          nextData.center = center
+          nextData.target = newTarget
+          nextData.effect = effect
+          nextData.source = source
+        })
+        this.props.dispatch({ type: "deal/_setTypeEffect", payload: { typeEffect: NewfloorEffect }})
+      }
+
+      let sumprice = numeral(currentOrder.reduce(function (total, currentValue, currentIndex, arr) {
+        return total + currentValue.TotalSaleAmt;
+      }, 0)).format('0[.]00');
+
+      let newPoint = produce(typePoint, nextData => {
+        nextData.nodes[0].attributes.name = String(Number(nextData.nodes[0].attributes.name) + Number(sumprice))
+        const newNum = nextData.nodes[0].attributes.name
+        nextData.nodes[0].name = numeral(newNum).format('0[.]00')
+        nextData.nodes.forEach(_ => {
+          currentOrder.forEach((e) => {
+            if(e.StoreName === _.name){
+              _.TotalSaleAmt = numeral(Number(_.TotalSaleAmt) + Number(e.TotalSaleAmt)).format('0[.]00')
+              return _
+            }
+            if(_.OperationID && e.OperationTypeId === _.OperationID){
+              _.TotalSaleAmt = numeral(Number(_.TotalSaleAmt) + Number(e.TotalSaleAmt)).format('0[.]00')
+              return _
+            }
+          })
+        })
+      });
+      this.props.dispatch({ type: "deal/_setTypeCenterVal", payload: { Data: newPoint }})
+    }
+    ++initIndex;
+  }
+
+  componentWillReceiveProps(props){
+    if(!isEqual(props.deal.storesliving, this.props.deal.storesliving)){
+      if(this.timerID){
+        initIndex = 0;
+        return this.timerID
+      }
+      this.timerID = setInterval(() => {
+        this.update()
+      }, 3000)
     }
   }
 
   shouldComponentUpdate(nextProps, nextState){
-    // console.log("nextProps", nextState)dealBtnInit
-    if( this.props.updateIndex !== nextProps.updateIndex || this.props.typePoint !== nextProps.typePoint || this.state !== nextState){
-      return true;
-    }
-    return false;
+    return !isEqual(nextProps, this.props)
   }
 
-  componentWillReceiveProps(nextProps) {
-    // console.log("this.props.updateIndex", this.props.currentOrder)
-    // console.log("nextProps.currentOrder", nextProps.currentOrder)
-    // console.log("之前", this.props.updateIndex)
-    // console.log("-----------------------------")
+  // static getDerivedStateFromProps(nextProps, prevState) {
+  //   if (nextProps.deal.currentOrder && !_.isEqual(nextProps.deal.currentOrder, prevState.currentOrder)){
+  //     const { currentOrder, typeSalesVal, typePoint } = nextProps.deal;
+  //     let target = [],
+  //       source = [],
+  //       center = [],
+  //       effect = [],
+  //       getFloorID = [];
+  //     if(currentOrder.length !== 0) {
+  //       _.forEach(typeSalesVal, (el, j) => {
+  //         _.forEach(currentOrder, (e, i) => {
+  //           if(el.OperationID === e.OperationTypeId) getFloorID.push(el)
+  //         })
+  //       });
+  //
+  //       _.forEach(typePoint.nodes, (item, index) => {
+  //         _.forEach(getFloorID, (e, i) => {
+  //           if(item.name === e.OperationName) target.push({...item})
+  //         })
+  //         _.forEach(currentOrder, (e, i) => {
+  //           if(item.name === e.StoreName) source.push(item)
+  //         })
+  //       });
+  //
+  //       const newTarget = _.uniq(target);
+  //       if (source.length !== 0 && target.length !== 0){
+  //         center = typePoint.nodes.filter(_ => _.id === '0'); //中心点
+  //         _.forEach(typePoint.edges, (el, j) => {
+  //           _.forEach(source, (ele, i) => {
+  //             _.forEach(target, (o, p) => {
+  //               if(el.source === ele.id && el.target === o.id){
+  //                 effect.push(
+  //                   { "period": 1, "delay": 10, "data": [{"coords":[ele.value, o.value]}]},
+  //                   { "period": 1.6, "delay": 900, "data": [{"coords":[o.value, center[0].value]}]}
+  //                 );
+  //               }
+  //             });
+  //           });
+  //         });
+  //       }
+  //       return {
+  //         currentOrder: nextProps.deal.currentOrder,
+  //         target: newTarget,source, effect, center
+  //       }
+  //     }
+  //     return initState
+  //   }
+  //   return null
+  // }
 
-    if(this.props.updateIndex !== nextProps.updateIndex){//更新
-      //清除动画
-      // console.log("当前序号1：", this.props.updateIndex)
-      // console.log("当前2", nextProps.updateIndex)
-      if(this.props.updateIndex === nextProps.storesliving.length){
-        this.setState({center: [], source:[], target: [], effect: [], storeSales: 0})
-        return
-      }
-      this._autoPlayPointForOrder(nextProps);
-    }
-  }
+
+  // componentDidUpdate(nextProps, nextState){
+  //   // console.warn("nextProps", nextProps.deal.currentOrder)
+  //   // console.warn("this.state", this.state.currentOrder)
+  //   // console.warn("nextState", nextState.currentOrder)
+  //   console.warn("nextProps.deal.currentOrder", nextProps.deal.currentOrder)
+  //   console.warn("nextState", this.state.currentOrder)
+  //   console.warn("nextState", !_.isEqual(this.state.currentOrder, nextProps.deal.currentOrder))
+  //
+  //   if(!_.isEqual(this.state.currentOrder, nextProps.deal.currentOrder)){
+  //     console.log('%c 业态：当前订单不一样','background:#282C34;color:#42C02E', this.state.currentOrder);
+  //   }else {
+  //     if(nextProps.deal.currentOrder.length !== 0){
+  //       if (this.newTimer) {
+  //         clearTimeout(this.newTimer);
+  //       }
+  //       this.newTimer = setTimeout(() => {
+  //         this.props.dispatch({ type: 'deal/_setCurrentOrder', payload: {currentOrder: []}})
+  //       }, 3000)
+  //       console.log('%c 业态：当前订单一样了','background:#aaa;color:#EA6F5A', this.state.currentOrder);
+  //     }
+  //   }
+  //
+  //   // if(this.state.currentOrder !== nextProps.deal.currentOrder){
+  //   //   console.log('%c 业态：当前订单不一样','background:#282C34;color:#42C02E', this.state.currentOrder);
+  //   // }else {
+  //   //   if (this.newTimer) {
+  //   //     clearTimeout(this.newTimer);
+  //   //   }
+  //   //   this.newTimer = setTimeout(() => {
+  //   //     this.props.dispatch({ type: 'deal/_setCurrentOrder', payload: {currentOrder: []}})
+  //   //   }, 3000)
+  //   //   console.log('%c 业态：当前订单一样了','background:#aaa;color:#EA6F5A', this.state.currentOrder);
+  //   // }
+  // }
+
+  // shouldComponentUpdate(nextProps, nextState){
+  //   // console.log("nextProps", nextState)dealBtnInit
+  //   if( this.props.updateIndex !== nextProps.updateIndex || this.props.typePoint !== nextProps.typePoint || this.state !== nextState){
+  //     return true;
+  //   }
+  //   return false;
+  // }
 
 
   componentWillUnmount() {
     this.timer && clearInterval(this.timer);
+    if(this.timerID){
+      clearInterval(this.timerID)
+    }
   }
 
   _getStoreInfo = (params) => {
-    if(params.data.id !== '0'){
-      console.warn("params", params)
-      const { StartTime, EndTime } = this.props.fetchDate
+    console.log('%c 业态：点击查询数据','background:#aaa;color:red', params);
+    if(params.data.id !== '0' && params.data.TotalSaleAmt){
       const ModalBasic = {
         width: 300,
         maskClosable: true,
@@ -162,9 +271,6 @@ class FlightMap extends Component {
         });
       }else {
         if(params.data.storeId){
-          const payload = {StartTime, EndTime, StoreID: params.data.storeId.StoreId}
-          this.props.dispatch({ type: 'deal/getStoresInfo', payload })
-          console.log("params.data", params)
           Modal.info({
             title: `店铺名称: ${params.name}`,
             ...ModalBasic,
@@ -181,11 +287,10 @@ class FlightMap extends Component {
 
 
   render() {
-    // console.warn("===========类型图渲染一次==============")
-    const { hide, typePoint } = this.props;
-    const { edges, nodes } = typePoint;
-    const { center, effect, source, target } = this.state;
 
+    const { hide, deal } = this.props;
+    const { effect, center, source, target } = deal.typeEffect;
+    const { edges, nodes } = deal.typePoint;
     const StyledDiv = styled.div`
       display: ${ hide ? "block" : "none" };
       position: relative;
@@ -195,10 +300,25 @@ class FlightMap extends Component {
       left: 0;
     `;
 
+    const HlodCont = styled.div`
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      display: ${ hide ? "flex" : "none" };
+    `;
+
     /**
      * Recharts 参数：
      * notMerge:
      * */
+    if (nodes.length === 1){
+      return <HlodCont>
+        <Empty image={EmptyIma} description={<span style={{color: '#2880B4', fontSize: 16}}>暂无相关业态点位数据，请在管理后台设置</span>} />
+      </HlodCont>
+    }
     return (
       <StyledDiv ref={this.echartsRefs} >
         <Recharts
@@ -211,9 +331,8 @@ class FlightMap extends Component {
             {offset: 1, color: '#090237'}
             ])}
           onEvents = {[['click',params  =>  this._getStoreInfo(params)]]}
-          onLoad={(Instance) => this.setToolTipSwich(Instance)}
         >
-          <Tooltip trigger="item" triggerOn="none" formatter={this.formatter} extraCssText={config.dealToolTips}/>
+          <Tooltip trigger="item" triggerOn="none" extraCssText={config.dealToolTips}/>
           <YAxis type="value" show={false}/>
           <XAxis type="value" show={false}/>
           <Grid left={0} right={210} bottom={0} top={120} containLabel={false}/>
@@ -297,6 +416,11 @@ class FlightMap extends Component {
 
 FlightMap.propTypes = {
   hide: PropTypes.bool,
+  dispatch: PropTypes.func,
+  updateIndex: PropTypes.number,
+  typeSalesVal: PropTypes.array,
+  storesliving: PropTypes.array,
+  typePoint: PropTypes.object,
 }
 
 export default FlightMap

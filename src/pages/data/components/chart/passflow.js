@@ -3,6 +3,9 @@ import styled from 'styled-components'
 import { Statistic, Icon } from 'antd';
 import WaterBall from '@/components/waterBall';
 import styles from './index.less';
+import PropTypes from 'prop-types';
+import { formaterVal } from '@/utils'
+import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 // import { WaterWave } from 'ant-design-pro/lib/Charts';
 const Title = styled.h3`
   margin: 0;
@@ -56,8 +59,8 @@ const PassflowChart = styled.div`
 
 
 class Passflow extends PureComponent {
-  getCircleProps = () =>{
-    let props = {
+  getCircleProps = () =>(
+    {
       idDom: 'circleWaterBall2',
       width: 120,
       height: 120,
@@ -66,24 +69,14 @@ class Passflow extends PureComponent {
       textSize: .9,
       title: '提袋率',
       outerCircle:{
-        r: 60,
+      r: 60,
         fillColor: '#02c7ff'
-      },
-      innerCircle:{
-        r: 58,
+    },
+    innerCircle:{
+      r: 58,
         fillColor: '#00AFF6'
-      }
-    };
-    return props;
-  }
-
-  // shouldComponentUpdate(nextProps, nextState){
-  //   if(this.props !== nextProps){
-  //     return true;
-  //   }
-  //   return false;
-  // }
-
+    }}
+  )
 
 
   render() {
@@ -118,16 +111,24 @@ class Passflow extends PureComponent {
       return initIcon
     };
     return (
-      <div className={styles.div1_text + ' ' + styles.four_corner_border}>
+      <ReactCSSTransitionGroup
+        transitionEnter={true}
+        transitionLeave={true}
+        transitionEnterTimeout={2500}
+        transitionLeaveTimeout={1500}
+        transitionName="animated"
+      >
+      <div key="amache" className={'animated bounceInUp' + ' ' +styles.div1_text + ' ' + styles.four_corner_border}>
         <PassflowText>
           <Title>客流</Title>
-          <Statistic
-            value={TotalPassengerFlowCount}
-            precision={2}
-            valueStyle={{ fontSize: 34,color: '#fff' }}
-            suffix="万"
-            style={{width: '100%'}}
-          />
+          {formaterVal(TotalPassengerFlowCount, 2, 2, "人次", "万人次", { fontSize: 34,color: '#fff' }, {width: '100%'})}
+          {/*<Statistic*/}
+            {/*value={TotalPassengerFlowCount}*/}
+            {/*precision={2}*/}
+            {/*valueStyle={{ fontSize: 34,color: '#fff' }}*/}
+            {/*suffix="万"*/}
+            {/*style={{width: '100%'}}*/}
+          {/*/>*/}
           <IntroText>
             <ItemTitle>环比</ItemTitle>
             <Result>
@@ -155,12 +156,13 @@ class Passflow extends PureComponent {
           <IntroText>
             <ItemTitle>车流</ItemTitle>
             <Result>
-              <Statistic
-                value={CarInCount}
-                precision={2}
-                valueStyle={{ fontSize: 16,color: '#fff' }}
-                suffix="车次"
-              />
+              {formaterVal(CarInCount, 0, 0, "车次", "万车次", { fontSize: 16,color: '#fff' }, null)}
+              {/*<Statistic*/}
+                {/*value={CarInCount}*/}
+                {/*precision={2}*/}
+                {/*valueStyle={{ fontSize: 16,color: '#fff' }}*/}
+                {/*suffix="车次"*/}
+              {/*/>*/}
             </Result>
           </IntroText>
         </PassflowText>
@@ -177,8 +179,15 @@ class Passflow extends PureComponent {
           {/*</div>*/}
         </PassflowChart>
       </div>
+      </ReactCSSTransitionGroup>
     )
   }
+}
+Passflow.propTypes = {
+  CarInCount: PropTypes.number,
+  PaidPercent: PropTypes.number,
+  SequentialValue: PropTypes.number,
+  TotalPassengerFlowCount: PropTypes.number
 }
 
 export default Passflow

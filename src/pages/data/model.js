@@ -21,8 +21,8 @@ import moment from 'moment'
 export default {
   namespace: 'data',
   state: {
-    FloorInfoList: [],
-    GetStoreInfo: {
+    FloorInfoList: [],//楼层信息
+    GetStoreInfo: {//查询店铺信息返回结果
       StoreName: '',
       OperationName: '',
       SaleRank: 0,
@@ -36,7 +36,7 @@ export default {
       DoorNumber: '',
       UnChargeAmt: 0,
     },
-    StoreCompare: {
+    StoreCompare: {//店铺数据比较
       SaleAmt: 0,
       SaleSequentialValue: 0,
       EarningAmt: 0,

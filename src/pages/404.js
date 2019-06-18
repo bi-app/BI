@@ -19,5 +19,4 @@ class Error extends PureComponent {
     )
   }
 }
-
 export default Error

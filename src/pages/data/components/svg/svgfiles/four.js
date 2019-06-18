@@ -57,27 +57,24 @@ class Four extends Component {
   }
 
   _getStoreInfo = (e) => {
-    console.log(e.originalEvent.target.getAttribute("data-storeid"))
     const StoreID = e.originalEvent.target.getAttribute("data-storeid");
     const { dispatch, globalData: {rangeDate, StartDate, EndDate}} = this.props;
-    const Start = moment(StartDate).format('YYYY-MM')
-    const End = moment(EndDate).format('YYYY-MM')
-    const payload = { StartDate: Start, EndDate: End, StoreID }
+    const Start = moment(StartDate).format('YYYY-MM');
+    const End = moment(EndDate).format('YYYY-MM');
+    const payload = { StartDate: Start, EndDate: End, StoreID };
     const IncomeForm = { StartDate: moment().subtract(12, 'months').format('YYYY-MM'), EndDate: moment().subtract(1, 'months').format('YYYY-MM'), StoreID }
     if(StoreID){
       //店铺基本信息
-      dispatch({type: 'data/GetStoreInfo', payload})
-      dispatch({type: 'data/GetStoreCompareInfo', payload})
-      dispatch({type: 'data/GetStoreSale', payload})
-      dispatch({type: 'data/GetStoreSequential', payload: IncomeForm})
+      dispatch({type: 'data/GetStoreInfo', payload});
+      dispatch({type: 'data/GetStoreCompareInfo', payload});
+      dispatch({type: 'data/GetStoreSale', payload});
+      dispatch({type: 'data/GetStoreSequential', payload: IncomeForm});
       this.setState({visible: true, StoreID});
     }
   }
 
   handleCancel = (e) => {
-    this.setState({
-      visible: false,
-    });
+    this.setState({ visible: false });
   }
 
   render() {
@@ -209,9 +206,9 @@ class Four extends Component {
             onChangeValue={value => this.changeValue(value)}
             onClick={this._getStoreInfo}
           >
-            <svg  width={750} height={930} viewBox="0 0 750.9 924.6" className={styles.svg}>
+            <svg  width={750} height={930} viewBox="0 0 750.9 924.6">
               <g className="no">
-                <path className={styles.st0} d="M392.7,24.6c-0.8,0-76.5-2.7-133.3,53.7c-25.3,25-35.2,50.7-43.1,71.3c-0.6,1.4-1.1,2.7-1.5,4.1
+                <path className={styles.svg_bg} d="M392.7,24.6c-0.8,0-76.5-2.7-133.3,53.7c-25.3,25-35.2,50.7-43.1,71.3c-0.6,1.4-1.1,2.7-1.5,4.1
 			c-6.3,16-9.7,49.1-8.7,68.7c1.4,30.4,5.5,122.5-14.5,172.1c-19.2,46.8-59.3,83.6-119.1,109.1c-22.7,9.6-55.6,42.9-55.6,73.1v55.1
 			l41.3,77v165.4c0,14.3,19.7,29.6,30.3,29.6h465.9l42.3-43.5l3.5,1.7c3.5,1.7,7.6,0.9,10.7-1.8l77.7-72.2c4.3-4,6-11.3,4.1-17.5
 			l-1.5-5.2l39.9-40.9V136.7L689.4,23.8L392.7,24.6z M506.7,645.8c0,0-2.1,19.5-8.3,28.1c-6.1,8.5-24.2,15.4-24.2,15.4H435h-34h-35
@@ -221,7 +218,7 @@ class Four extends Component {
 			 M513,158.4c-3.9,16.2-11.7,48.2-13.8,57.2c-3,12.2-10.2,51.6-10.2,51.6c-1.1,4.6-4.1,7.8-7.9,7.9l-34.8,1.8
 			c-4.4,0.3-8.3-3.7-9.2-9.2c0,0-3.9-25-10.4-52.2s-16.5-55.1-16.5-55.1c-1.7-5.6,1.5-11.6,6.1-11.6h82.3h9.1
 			C511.5,148.8,514.2,153.6,513,158.4z"/>
-                <path className={styles.st0} d="M750.9,123.6L702.1,0L394.3,0.8c0,0-83-5.6-143.7,54.5c-28.5,28.2-44,56-52.4,77.5c-7,17.5-10,37.2-9.1,57.1
+                <path className={styles.svg_bg} d="M750.9,123.6L702.1,0L394.3,0.8c0,0-83-5.6-143.7,54.5c-28.5,28.2-44,56-52.4,77.5c-7,17.5-10,37.2-9.1,57.1
 			c1.9,41,4.5,148-15.5,197c-13.3,32.8-24.1,40.4-101.9,90.3c-22.6,14.3-69.4,45-69.4,77.4L0,635l41.7,79.2v182.6
 			c0,15.3,9.6,27.8,21.5,27.8h512.2l44.9-44.2l3.9,1.7c1.8,0.8,3.7,0.3,5.2-1.2l76.9-78.3c2-2.1,2.7-5.6,1.7-8.7l-0.8-2.4l43.9-43.8
 			V123.6H750.9z M732.1,724.7l-0.2,0.2l-39.6,40.4l1.3,4.3c2.1,7,0.2,15-4.5,19.4l-77.6,72.3c-3.4,3.2-7.8,4-11.8,2.1l-3-1.4
@@ -238,10 +235,12 @@ class Four extends Component {
                     />
                     <text
                       transform={_.doorNum.transform}
+                      className={styles.svg_text_font}
                       fill={`${currentKey ? currentKey === '356' ? '#FFF' : '#7a7c99' : '#fff'}`}
                     >{ EmptyStoreIsShowDoorNum === 1 ? _.doorNum.num : ''}</text>
                     <text
                       transform={_.doortext.transform}
+                      className={styles.svg_text_font}
                       fill={`${currentKey ? currentKey === '356' ? '#FFF' : '#7a7c99' : '#fff'}`}
                     >{ EmptyStoreIsShowOther === 1 ? EmptyStoreShowOtherInfo : '' }</text>
                   </g>
@@ -256,10 +255,12 @@ class Four extends Component {
                     />
                     <text
                       transform={_.doorNum.transform}
+                      className={styles.svg_text_font}
                       fill={`${currentKey ? currentKey === '356' ? '#FFF' : '#7a7c99' : '#fff'}`}
                     >{ EmptyStoreIsShowDoorNum === 1 ? _.doorNum.num : ''}</text>
                     <text
                       transform={_.doortext.transform}
+                      className={styles.svg_text_font}
                       fill={`${currentKey ? currentKey === '356' ? '#FFF' : '#7a7c99' : '#fff'}`}
                     >{ EmptyStoreIsShowOther === 1 ? EmptyStoreShowOtherInfo : '' }</text>
                   </g>
@@ -277,10 +278,12 @@ class Four extends Component {
                     />
                     <text
                       transform={_.doorNum.transform}
+                      className={styles.svg_text_font}
                       fill={`${currentKey ? currentKey === '356' ? '#FFF' : '#7a7c99' : '#fff'}`}
                     >{ EmptyStoreIsShowDoorNum === 1 ? _.doorNum.num : ''}</text>
                     <text
                       transform={_.doortext.transform}
+                      className={styles.svg_text_font}
                       fill={`${currentKey ? currentKey === '356' ? '#FFF' : '#7a7c99' : '#fff'}`}
                     >{ EmptyStoreIsShowOther === 1 ? EmptyStoreShowOtherInfo : '' }</text>
                   </g>
@@ -296,8 +299,18 @@ class Four extends Component {
                       data-storeid={_.storeid}
                       data-degreeid={_.DegreeID}
                     />
-                    <text transform={_.numTrans} fill={_.fillText}>{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
-                    <text transform={_.textTrans} fill={_.fillText}>{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
+                    <text
+                      data-storeid={_.storeid}
+                      transform={_.numTrans}
+                      fill={_.fillText}
+                      className={styles.svg_text_font}
+                    >{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
+                    <text
+                      data-storeid={_.storeid}
+                      transform={_.textTrans}
+                      fill={_.fillText}
+                      className={styles.svg_text_font}
+                    >{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
                   </g>
                 })
               }
@@ -311,8 +324,18 @@ class Four extends Component {
                       data-storeid={_.storeid}
                       data-degreeid={_.DegreeID}
                     />
-                    <text transform={_.numTrans} fill={_.fillText}>{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
-                    <text transform={_.textTrans} fill={_.fillText}>{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
+                    <text
+                      data-storeid={_.storeid}
+                      transform={_.numTrans}
+                      fill={_.fillText}
+                      className={styles.svg_text_font}
+                    >{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
+                    <text
+                      data-storeid={_.storeid}
+                      transform={_.textTrans}
+                      fill={_.fillText}
+                      className={styles.svg_text_font}
+                    >{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
                   </g>
                 })
               }
@@ -329,8 +352,18 @@ class Four extends Component {
                       data-degreeid={_.DegreeID}
                       style={{cursor: 'pointer'}}
                     />
-                    <text transform={_.numTrans} fill={_.fillText}>{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
-                    <text transform={_.textTrans} fill={_.fillText}>{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
+                    <text
+                      data-storeid={_.storeid}
+                      transform={_.numTrans}
+                      fill={_.fillText}
+                      className={styles.svg_text_font}
+                    >{ DefaultStoreIsShowDoorNum === 1 ? _.num : ''}</text>
+                    <text
+                      data-storeid={_.storeid}
+                      transform={_.textTrans}
+                      fill={_.fillText}
+                      className={styles.svg_text_font}
+                    >{ DefaultStoreIsShowStoreName === 1 ? _.text : ''}</text>
                   </g>
                 })
               }
