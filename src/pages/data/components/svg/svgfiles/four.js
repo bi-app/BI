@@ -23,10 +23,15 @@ class Four extends Component {
   }
 
   componentDidMount() {
-    this.Viewer.fitToViewer("center", "center");
+    // this.Viewer.fitToViewer("center", "center");
     const width = this.wrapper.clientWidth
     const height = this.wrapper.clientHeight
-    this.setState({width, height})
+    // this.setState({width, height})
+    this.setState(() => ({
+      width, height
+    }), () => {
+      this.Viewer && this.Viewer.fitSelection(-(width/2 - 130), 0, 750, 930)
+    });
   }
 
   changeTool(nextTool) {

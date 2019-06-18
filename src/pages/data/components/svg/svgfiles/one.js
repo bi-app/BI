@@ -1,6 +1,6 @@
 import React, { Fragment, Component } from 'react'
 import styles from './one.less'
-import {INITIAL_VALUE, ReactSVGPanZoom, TOOL_NONE, TOOL_AUTO} from 'react-svg-pan-zoom';
+import {INITIAL_VALUE, ReactSVGPanZoom, fitSelection, fitToViewer, zoomOnViewerCenter, TOOL_NONE, TOOL_AUTO} from 'react-svg-pan-zoom';
 import floorOne from './json/one';
 import Modal from '../modal'
 import _ from 'lodash'
@@ -24,50 +24,35 @@ const _updateState = (state, key = [], value = []) => {
 
 @connect(({globalData, data}) => ({globalData, data}))
 class One extends Component {
-  Viewer = React.createRef();
+  Viewer = null;
   wrapper = React.createRef();
   state = {
-    tool: "auto",
+    tool: TOOL_AUTO,
     value: INITIAL_VALUE,
     width: 800,
     height: 544,
     visible: false,
   }
 
-
   componentDidMount() {
-    this.Viewer.current && this.Viewer.current.fitToViewer("center", "center");
-    // this.Viewer.current && this.fitSelection()
     const width = this.wrapper.current.clientWidth;
     const height = this.wrapper.current.clientHeight;
     // const nextState = _updateState(this.state, ["width", "height"], [width, height]);
-    this.setState({width, height});
-    // this.setState(nextState);
+    this.setState(() => ({
+      width, height
+    }), () => {
+      this.Viewer && this.Viewer.fitSelection(-(width/2 - 255), 0, 510, 620)
+    });
   }
 
-
   changeTool = (nextTool) => {
-    this.setState({tool: nextTool})
-    // const nextState = _updateState(this.state, ["tool"], [nextTool]);
-    // this.setState(nextState);
+    const nextState = _updateState(this.state, ["tool"], [nextTool]);
+    this.setState(nextState);
   }
 
   changeValue = (nextValue) => {
-    this.setState({value: nextValue})
-    // const nextState = _updateState(this.state, ["value"], [nextValue]);
-    // this.setState(nextState);
-  }
-
-  fitToViewer() {
-    this.Viewer.current.fitToViewer("center", "center")
-  }
-
-  fitSelection() {
-    this.Viewer.current.fitSelection(440, 440, 23, 23)
-  }
-
-  zoomOnViewerCenter() {
-    this.Viewer.current.zoomOnViewerCenter(1)
+    const nextState = _updateState(this.state, ["value"], [nextValue]);
+    this.setState(nextState);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -212,7 +197,7 @@ class One extends Component {
         }
       })
     });
-
+    // 510 600
     return (
       <Fragment>
         <div className={styles.wrapper} style={{width: "100%", height: "100%"}} ref={this.wrapper}>
@@ -221,7 +206,7 @@ class One extends Component {
             height={height}
             background={"#0C0028"}
             SVGBackground={"#0C0028"}
-            ref={this.Viewer}
+            ref={Viewer => this.Viewer = Viewer}
             tool={tool}
             detectAutoPan={false}
             toolbarProps={{position: 'none'}}
@@ -231,7 +216,7 @@ class One extends Component {
             onChangeValue={this.changeValue}
             onClick={this._getStoreInfo}
           >
-            <svg width={510} height={600} viewBox="0 0 507.3 626" className={styles.svg}>
+            <svg width={510} height={600} viewBox="0 0 507.3 626">
               <g className="no">
                 <path className={styles.st0} d="M507.3,81.3L480.8,0.8h-216c0,0-56.1-9-97.1,31.7c-40.9,40.7-40.9,83.5-40.9,83.5s-0.7,58-17.8,99.3
 		c-13.6,32.9-50.1,65.4-67.9,79.9c-7.7,6.3-15.2,13.1-22.4,20.5L0,335.1V425l28.2,54.6v127.7c0,10.4,6.5,18.7,14.5,18.7h346l30.3-30

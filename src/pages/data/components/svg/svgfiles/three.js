@@ -23,10 +23,15 @@ class Three extends Component {
   }
 
   componentDidMount() {
-    this.Viewer.fitToViewer("center", "center");
+    // this.Viewer.fitToViewer("center", "center");
     const width = this.wrapper.clientWidth
     const height = this.wrapper.clientHeight
-    this.setState({width, height})
+    // this.setState({width, height})
+    this.setState(() => ({
+      width, height
+    }), () => {
+      this.Viewer && this.Viewer.fitSelection(-(width/2 - 250), 0, 536, 650)
+    });
   }
 
   changeTool(nextTool) {
@@ -218,7 +223,7 @@ class Three extends Component {
             onChangeValue={value => this.changeValue(value)}
             onClick={this._getStoreInfo}
           >
-            <svg width={536} height={658} viewBox="0 0 536.2 657" className={styles.svg}>
+            <svg width={536} height={650} viewBox="0 0 536.2 657" className={styles.svg}>
               <g>
                 <path className={styles.st0} d="M536.2,87.8L501.3,0L281.6,0.4c0,0-59.3-4-102.6,38.7c-20.4,20.1-31.4,39.8-37.5,55.1
 	c-5,12.5-7.2,26.5-6.5,40.5c1.4,29.2,3.3,105.2-11.1,140c-9.5,23.3-17.2,28.7-72.8,64.2c-16,10.3-49.5,32-49.5,55L0,451.2l29.8,56.3

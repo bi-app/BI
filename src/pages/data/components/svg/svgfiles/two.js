@@ -11,7 +11,7 @@ import _ from 'lodash'
 @connect(({globalData, data}) => ({globalData, data}))
 class Two extends Component {
   Viewer = null;
-  wrapper = null;
+  wrapper = React.createRef();;
   svgwarp = null;
   state = {
     tool: "auto",
@@ -23,10 +23,15 @@ class Two extends Component {
   }
 
   componentDidMount() {
-    this.Viewer.fitToViewer("center", "center");
-    const width = this.wrapper.clientWidth
-    const height = this.wrapper.clientHeight
-    this.setState({width, height})
+    // this.Viewer.fitToViewer("center", "center");
+    const width = this.wrapper.current.clientWidth
+    const height = this.wrapper.current.clientHeight
+    // this.setState({width, height})
+    this.setState(() => ({
+      width, height
+    }), () => {
+      this.Viewer && this.Viewer.fitSelection(-(width/2 - 250), 0, 500, 626)
+    });
   }
 
   changeTool(nextTool) {
@@ -226,7 +231,7 @@ class Two extends Component {
     // console.log("我被渲染了一次")
     return (
       <Fragment>
-        <div className={styles.wrapper} ref={_ => this.wrapper = _}>
+        <div className={styles.wrapper} ref={this.wrapper}>
           <ReactSVGPanZoom
             width={width}
             height={height}
@@ -242,7 +247,7 @@ class Two extends Component {
             onChangeValue={value => this.changeValue(value)}
             onClick={this._getStoreInfo}
           >
-            <svg width={510} height={626} viewBox="0 0 504.1 621.7" className={styles.svg}>
+            <svg width={500} height={626} viewBox="0 0 504.1 621.7" className={styles.svg}>
               <g className="no">
                 <path className={styles.st0} d="M504.1,80.7L504.1,80.7L477.6,0.8H263.1c0,0-55.7-8.9-96.4,31.5s-40.7,83-40.7,83s-0.7,57.6-17.8,98.7
 		c-13.6,32.7-49.8,65-67.4,79.3c-7.7,6.2-15.1,13.1-22.2,20.4L0,332.8V422l28,54.2V603c0,10.2,6.4,18.6,14.4,18.6h343.8l30.1-29.7

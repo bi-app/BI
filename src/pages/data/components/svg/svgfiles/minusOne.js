@@ -23,10 +23,15 @@ class MinusOne extends Component {
   }
 
   componentDidMount() {
-    this.Viewer.fitToViewer("center", "center");
+    // this.Viewer.fitToViewer("center", "center");
     const width = this.wrapper.clientWidth
     const height = this.wrapper.clientHeight
-    this.setState({width, height})
+    // this.setState({width, height})
+    this.setState(() => ({
+      width, height
+    }), () => {
+      this.Viewer && this.Viewer.fitSelection(-(width/2 - 190), 10, 860, 860)
+    });
   }
 
   changeTool(nextTool) {
@@ -181,7 +186,7 @@ class MinusOne extends Component {
             onChangeValue={value => this.changeValue(value)}
             onClick={this._getStoreInfo}
           >
-            <svg width={850} height={910} viewBox="0 0 843.5 902.6">
+            <svg width={860} height={860} viewBox="0 0 843.5 902.6">
               <g>
                 <path className={styles.svg_bg} d="M422.7,112.7l-452.3-2.1v762.3l841.5,0.1l37-30.4V545.3H873V140.8h-24.1h-71.4l-27.6,0.2H637.8V57.8h-124V29.5
 		h-91.1L422.7,112.7L422.7,112.7z M504.4,53.3v28.3h123.9v83.2h109.1l52.9-0.2h34.9h27.3v356.9h-24.1l-3.2,297.3l-37,30.4
